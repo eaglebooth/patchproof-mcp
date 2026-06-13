@@ -35,6 +35,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts", "bench/**/*.ts", "scripts/**/*.ts"],
+  "include": ["src/**/*.ts", "api/**/*.ts", "tests/**/*.ts", "bench/**/*.ts", "scripts/**/*.ts"],
   "exclude": ["node_modules", "dist", "coverage", ".cache", "web", "examples"]
 }

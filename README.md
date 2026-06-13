@@ -28,7 +28,11 @@ Important limitations:
 - There is no browser demo, Docker image, deployment, CI workflow, or published
   coverage claim in this revision.
 - Streamable HTTP is scaffolded and should not yet be treated as a verified
-  production transport.
+  production transport when using the local CLI.
+
+The Vercel demo exposes a stateless Streamable HTTP endpoint at `/api/mcp`.
+For safety, every public tool call is locked to the bundled demo fixture; it
+does not accept arbitrary server filesystem paths.
 
 ## Requirements
 
@@ -54,6 +58,24 @@ Build first, then start the stdio MCP server:
 ```bash
 npm run build
 npm run start:stdio
+```
+
+## Deploy The Live Demo
+
+Import this GitHub repository into Vercel and deploy with the default settings.
+The deployment provides:
+
+- `/` - a static project and tool overview;
+- `/api/mcp` - the stateless MCP Streamable HTTP endpoint;
+- a bundled npm fixture containing deterministic mock vulnerabilities.
+
+Verify the deployment:
+
+```bash
+curl -X POST https://YOUR-DEPLOYMENT.vercel.app/api/mcp \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
 ```
 
 ## Tool Summary
