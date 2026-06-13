@@ -29,7 +29,13 @@ interface AuditResult {
 
 interface ReportResult {
   format: string;
-  report: { schemaVersion: string; limitations: ReadonlyArray<string> };
+  report: {
+    schemaVersion: string;
+    inputs: { config: Record<string, unknown> };
+    findings: ReadonlyArray<{ id: string }>;
+    remediation: ReadonlyArray<{ package: string; recommendedVersion: string }>;
+    limitations: ReadonlyArray<string>;
+  };
   html?: string;
 }
 
@@ -111,9 +117,19 @@ describe('core MCP tools', () => {
 
     expect(result.format).toBe('both');
     expect(result.report.schemaVersion).toBeTruthy();
+    expect(result.report.inputs.config['componentCount']).toBe(1);
+    expect(result.report.inputs.config['vulnerabilityCount']).toBe(1);
+    expect(result.report.findings).toContainEqual(
+      expect.objectContaining({ id: 'lodash@4.17.20:GHSA-xxxx-yyyy-zzzz' }),
+    );
+    expect(result.report.remediation).toContainEqual(
+      expect.objectContaining({ package: 'lodash', recommendedVersion: '4.17.21' }),
+    );
     expect(result.report.limitations.length).toBeGreaterThan(0);
     expect(result.html).toContain('<!doctype html>');
     expect(result.html).toContain('PatchProof Evidence Report');
+    expect(result.html).toContain('SBOM components');
+    expect(result.html).toContain('GHSA-xxxx-yyyy-zzzz');
     expect(result.html).not.toMatch(/<script[^>]+src=/u);
     expect(result.html).not.toMatch(/<link[^>]+href=/u);
   });

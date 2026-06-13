@@ -1,5 +1,7 @@
 # PatchProof MCP
 
+[![CI](https://github.com/eaglebooth/patchproof-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/eaglebooth/patchproof-mcp/actions/workflows/ci.yml)
+
 PatchProof is a focused Model Context Protocol server for local npm
 supply-chain inspection. The MVP exposes four tools with deterministic,
 offline-friendly behavior.
@@ -13,8 +15,8 @@ The complete public tool set is implemented and covered by focused tests:
   `package-lock.json`.
 - `audit_dependencies`: dependency extraction with a deterministic mock
   vulnerability table.
-- `generate_evidence_report`: JSON evidence metadata and a self-contained HTML
-  preview.
+- `generate_evidence_report`: an end-to-end JSON/HTML artifact combining SBOM
+  components, matched vulnerabilities, and upgrade recommendations.
 
 Important limitations:
 
@@ -23,16 +25,20 @@ Important limitations:
   currently uses the same deterministic mock data.
 - `scan_repository` currently returns repository statistics; vulnerability and
   secret findings are not yet integrated into its result.
-- Evidence reports currently contain metadata and limitations, not a complete
-  end-to-end audit.
-- There is no browser demo, Docker image, deployment, CI workflow, or published
-  coverage claim in this revision.
+- Reachability classification and verification command execution are not yet
+  integrated into evidence reports.
+- The browser demo uses a bundled fixture and does not inspect arbitrary remote
+  repositories.
 - Streamable HTTP is scaffolded and should not yet be treated as a verified
   production transport when using the local CLI.
 
 The Vercel demo exposes a stateless Streamable HTTP endpoint at `/api/mcp`.
 For safety, every public tool call is locked to the bundled demo fixture; it
 does not accept arbitrary server filesystem paths.
+
+Committed, reproducible report artifacts are available at
+`examples/demo-report.json` and `examples/demo-report.html`. GitHub Actions
+rebuilds them and fails if the committed evidence becomes stale.
 
 ## Requirements
 
@@ -135,8 +141,9 @@ Input:
 }
 ```
 
-Returns evidence metadata as JSON and, for `html` or `both`, a self-contained
-HTML preview.
+Runs the implemented SBOM and deterministic dependency audit together. It
+returns findings and upgrade recommendations as JSON and, for `html` or
+`both`, a self-contained HTML report with summary metrics.
 
 ## Architecture
 
@@ -147,7 +154,7 @@ src/scanners     bounded repository traversal
 src/parsers      npm lockfile parsing
 src/sbom         deterministic SBOM assembly
 src/osv          deterministic mock dependency audit
-src/reporting    JSON and HTML evidence metadata
+src/reporting    end-to-end JSON and HTML evidence assembly
 src/security     path, resource, error, and redaction utilities
 src/transport    stdio and HTTP transport scaffolding
 tests/unit       infrastructure and focused core-tool tests
@@ -175,6 +182,8 @@ evidence. Manual verification confirmed:
 - strict TypeScript typecheck passes;
 - the Vitest suite passes;
 - the production TypeScript build passes.
+- GitHub Actions independently repeats those checks on Node.js 20 and verifies
+  that the committed demo evidence is reproducible.
 
 ## License
 

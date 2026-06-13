@@ -33,6 +33,7 @@
     "start:stdio": "node dist/server/index.js --transport=stdio",
     "start:http": "node dist/server/index.js --transport=http",
     "demo": "node scripts/demo.js",
+    "demo:evidence": "node scripts/generate-demo-evidence.mjs",
     "bench": "vitest bench --run",
     "audit:secrets": "bash scripts/audit-secrets.sh",
     "prepare": "node -e \"process.exit(0)\""
