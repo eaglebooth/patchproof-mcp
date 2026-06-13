@@ -1,12 +1,12 @@
 # PatchProof MCP
 
-PatchProof is an early-stage Model Context Protocol server for local npm
-supply-chain inspection. The current MVP registers eight MCP tools and
-implements four core tools with deterministic, offline-friendly behavior.
+PatchProof is a focused Model Context Protocol server for local npm
+supply-chain inspection. The MVP exposes four tools with deterministic,
+offline-friendly behavior.
 
 ## Current Status
 
-Implemented and covered by focused tests:
+The complete public tool set is implemented and covered by focused tests:
 
 - `scan_repository`: bounded repository file and byte counting.
 - `generate_sbom`: deterministic CycloneDX-shaped SBOM generation from
@@ -15,13 +15,6 @@ Implemented and covered by focused tests:
   vulnerability table.
 - `generate_evidence_report`: JSON evidence metadata and a self-contained HTML
   preview.
-
-Registered as compile-safe scaffolds, but not yet production-complete:
-
-- `detect_secrets`
-- `analyze_reachability`
-- `plan_remediation`
-- `verify_remediation`
 
 Important limitations:
 
@@ -127,7 +120,7 @@ HTML preview.
 
 ```text
 src/server       MCP registration and CLI
-src/tools        eight MCP tool definitions
+src/tools        four public MCP tool definitions
 src/scanners     bounded repository traversal
 src/parsers      npm lockfile parsing
 src/sbom         deterministic SBOM assembly

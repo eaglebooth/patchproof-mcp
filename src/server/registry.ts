@@ -1,5 +1,5 @@
 /**
- * MCP server registry. Aggregates the 8 tool definitions from
+ * MCP server registry. Aggregates the four public tool definitions from
  * `src/tools/*` and wires them onto a `McpServer` instance.
  *
  * The actual transport selection lives in `src/transport/*`; this

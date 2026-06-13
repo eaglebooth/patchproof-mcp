@@ -1,9 +1,20 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { buildServer } from '../../src/server/registry.js';
+import { TOOL_NAMES, tools } from '../../src/tools/index.js';
 import { getDefaultLogger, LoggerImpl, StderrJsonSink } from '../../src/utils/logger.js';
 
 describe('buildServer (scaffold)', () => {
+  it('publishes the complete four-tool MVP surface', () => {
+    expect(TOOL_NAMES).toEqual([
+      'scan_repository',
+      'generate_sbom',
+      'audit_dependencies',
+      'generate_evidence_report',
+    ]);
+    expect(tools.map((tool) => tool.name)).toEqual(TOOL_NAMES);
+  });
+
   it('returns an McpServer instance with the expected identity', () => {
     const server = buildServer({
       logger: new LoggerImpl({ sink: new StderrJsonSink({ quiet: true }) }),
