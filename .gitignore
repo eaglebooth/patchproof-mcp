@@ -1,0 +1,73 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+out/
+.cache/
+.turbo/
+.next/
+
+# Coverage and test artifacts
+coverage/
+*.lcov
+.nyc_output/
+
+# TypeScript
+*.tsbuildinfo
+.tsbuildinfo
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS junk
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Harness / research / internal
+.rlcr/
+.humanize/
+.research/
+.claude/
+.codex/
+.gemini/
+.opencode/
+.cursor/
+
+# Python (Clack harness uses Python for some helpers, ignore)
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Docker
+docker-compose.override.yml
+*.pid
+
+# Vitest
+.vitest-cache/
+
+# pnpm / yarn (we use npm)
+.pnpm-store/
+.yarn/

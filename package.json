@@ -1,0 +1,76 @@
+{
+  "name": "patchproof-mcp",
+  "version": "0.1.0",
+  "description": "PatchProof MCP — supply-chain security audit server (dependencies → vulnerabilities → reachability → remediation → verification → evidence) for AI agents.",
+  "private": true,
+  "type": "module",
+  "main": "dist/server/index.js",
+  "exports": {
+    ".": "./dist/server/index.js",
+    "./server": "./dist/server/index.js"
+  },
+  "bin": {
+    "patchproof": "dist/server/index.js"
+  },
+  "engines": {
+    "node": ">=20.0.0 <21.0.0",
+    "npm": ">=10.0.0"
+  },
+  "os": ["linux", "darwin"],
+  "cpu": ["x64", "arm64"],
+  "scripts": {
+    "clean": "rimraf dist coverage .cache",
+    "format": "prettier --write \"src/**/*.{ts,js,json,md}\" \"tests/**/*.{ts,js,json,md}\" \"web/**/*.{ts,js,html,css,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json,md}\" \"tests/**/*.{ts,js,json,md}\" \"web/**/*.{ts,js,html,css,json,md}\"",
+    "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "lint:fix": "eslint --fix \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "coverage": "vitest run --coverage",
+    "start": "node dist/server/index.js",
+    "start:stdio": "node dist/server/index.js --transport=stdio",
+    "start:http": "node dist/server/index.js --transport=http",
+    "demo": "node scripts/demo.js",
+    "bench": "vitest bench --run",
+    "audit:secrets": "bash scripts/audit-secrets.sh",
+    "prepare": "node -e \"process.exit(0)\""
+  },
+  "dependencies": {
+    "@cyclonedx/cyclonedx-library": "^10.0.0",
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "jsonc-parser": "^3.3.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@typescript-eslint/eslint-plugin": "^8.8.0",
+    "@typescript-eslint/parser": "^8.8.0",
+    "@vitest/coverage-v8": "^2.1.2",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.2"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "SECURITY.md",
+    ".env.example"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "supply-chain",
+    "security",
+    "sbom",
+    "cyclonedx",
+    "osv",
+    "vulnerabilities"
+  ],
+  "license": "MIT"
+}
