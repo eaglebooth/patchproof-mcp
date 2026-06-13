@@ -5,8 +5,7 @@
  * Each tool is a self-contained module:
  *   - a Zod input schema (validated by the SDK before the handler runs)
  *   - a `ToolDefinition` (name, description, inputSchema, run)
- *   - delegated business logic in `src/{scanners,sbom,osv,reachability,
- *     remediation,verification,reporting}/*`
+ *   - delegated business logic in `src/{scanners,sbom,osv,reporting}/*`
  */
 import { auditDependenciesTool } from './audit_dependencies.js';
 import { generateEvidenceReportTool } from './generate_evidence_report.js';
@@ -19,8 +18,7 @@ export type { ToolContext, ToolDefinition } from './types.js';
 /**
  * The exhaustive list of registered MCP tools. The order here is
  * the order returned by `tools/list`. A reviewer can confirm
- * coverage by checking the length and the names against
- * `docs/acceptance-evidence.md` AC-2.
+ * coverage by checking the length and names against the README.
  */
 export const TOOL_NAMES = [
   'scan_repository',
@@ -37,9 +35,3 @@ export const tools: ReadonlyArray<ToolDefinition> = [
   auditDependenciesTool,
   generateEvidenceReportTool,
 ];
-
-/**
- * Backwards-compatible alias for the AC-1 `toolStubs` import path.
- * The registry now uses the real `tools` array.
- */
-export const toolStubs: ReadonlyArray<ToolDefinition> = tools;

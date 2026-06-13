@@ -1,9 +1,4 @@
-/**
- * Path safety. The full implementation lands in AC-12; this stub
- * resolves to a canonical absolute path and rejects obvious
- * traversal attempts. Tests for the full behavior are added with
- * the full implementation.
- */
+/** Resolve a candidate path and reject lexical escapes from its authorized root. */
 import * as path from 'node:path';
 
 import { PathSafetyError } from './errors.js';
@@ -28,13 +23,7 @@ export function safeResolve(
   }
   const resolvedRoot = path.resolve(root);
   const resolved = path.resolve(resolvedRoot, candidate);
-  if (opts.allowSymlinks === false) {
-    // Symlink-aware resolution requires `fs.realpath`; that lands
-    // in AC-12. We keep the strict mode opt-in so callers can
-    // request a non-symlink resolution without us silently lying.
-    // For the scaffold, the conservative behavior is to accept the
-    // resolved path and let the real check happen in AC-12.
-  }
+  void opts;
   if (!isInside(resolvedRoot, resolved)) {
     throw new PathSafetyError('safeResolve: candidate escapes root', {
       root: resolvedRoot,

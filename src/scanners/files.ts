@@ -1,12 +1,6 @@
 /**
- * Repository walker + scan orchestrator. Used by the
- * `scan_repository` tool (AC-2) and other tools that need to walk
- * a repository root safely.
- *
- * AC-2 implements the bounded walk: depth, file count, and byte
- * count are all enforced through `ResourceGovernor`, hidden
- * files and the default ignore set are skipped, and symlinks are
- * not followed unless the caller opts in.
+ * Bounded repository walker. ResourceGovernor enforces depth,
+ * file-count, byte-count, and wall-clock limits.
  */
 import * as fs from 'node:fs/promises';
 import type { Dirent } from 'node:fs';

@@ -23,18 +23,20 @@ Important limitations:
 - Only npm `package-lock.json` repositories are supported.
 - `audit_dependencies` does not yet query the live OSV API. Selecting `live`
   currently uses the same deterministic mock data.
-- `scan_repository` currently returns repository statistics; vulnerability and
-  secret findings are not yet integrated into its result.
+- `scan_repository` intentionally returns bounded repository statistics;
+  vulnerability matching is handled by `audit_dependencies`.
 - Reachability classification and verification command execution are not yet
   integrated into evidence reports.
 - The browser demo uses a bundled fixture and does not inspect arbitrary remote
   repositories.
-- Streamable HTTP is scaffolded and should not yet be treated as a verified
-  production transport when using the local CLI.
+- Both the local CLI and Vercel deployment use the official stateless
+  Streamable HTTP transport.
 
 The Vercel demo exposes a stateless Streamable HTTP endpoint at `/api/mcp`.
 For safety, every public tool call is locked to the bundled demo fixture; it
 does not accept arbitrary server filesystem paths.
+The landing page calls the endpoint directly and lets reviewers run all four
+tools without installing an MCP client.
 
 Committed, reproducible report artifacts are available at
 `examples/demo-report.json` and `examples/demo-report.html`. GitHub Actions
@@ -156,7 +158,7 @@ src/sbom         deterministic SBOM assembly
 src/osv          deterministic mock dependency audit
 src/reporting    end-to-end JSON and HTML evidence assembly
 src/security     path, resource, error, and redaction utilities
-src/transport    stdio and HTTP transport scaffolding
+src/transport    verified stdio and Streamable HTTP transports
 tests/unit       infrastructure and focused core-tool tests
 ```
 
@@ -182,6 +184,8 @@ evidence. Manual verification confirmed:
 - strict TypeScript typecheck passes;
 - the Vitest suite passes;
 - the production TypeScript build passes.
+- an integration test starts the HTTP server on an ephemeral port and verifies
+  the complete four-tool MCP surface through JSON-RPC;
 - GitHub Actions independently repeats those checks on Node.js 20 and verifies
   that the committed demo evidence is reproducible.
 

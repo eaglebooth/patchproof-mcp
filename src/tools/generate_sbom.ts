@@ -1,9 +1,4 @@
-/**
- * `generate_sbom` MCP tool. Emits a CycloneDX 1.5 SBOM for the
- * repository's dependency graph. AC-2 wires the tool; AC-5
- * implements the lockfile-version-aware parser and validates the
- * output against the official CycloneDX JS schema.
- */
+/** Deterministic CycloneDX 1.5-shaped SBOM generation. */
 import { z } from 'zod';
 
 import { buildCycloneDxSbom } from '../sbom/cyclonedx.js';
@@ -34,8 +29,7 @@ export const generateSbomTool: ToolDefinition = {
   name: 'generate_sbom',
   description:
     'Build a CycloneDX 1.5 SBOM for the repository. Components include name, version, purl, and ' +
-    'declared licenses when available. Output is validated against the official CycloneDX JS ' +
-    'schema before being returned.',
+    'declared licenses when available. The serial number is content-addressed from package-lock.json.',
   inputSchema: generateSbomInputSchema,
   run: async (ctx: ToolContext, input: unknown): Promise<GenerateSbomOutput> => {
     const parsed = input as GenerateSbomInput;

@@ -1,13 +1,6 @@
 /**
- * CycloneDX SBOM assembly. Used by the `generate_sbom` tool
- * (AC-2) and the `generate_evidence_report` tool (AC-11).
- *
- * AC-2 implements the lockfile read + component assembly path.
- * The output is a CycloneDX 1.5 envelope with a content-
- * addressed serial number and one component per lockfile entry.
- * Schema validation against the official CycloneDX JS schema
- * lands in a later AC; the shape returned here is already the
- * stable 1.5 shape used by the upstream library.
+ * Build a deterministic CycloneDX 1.5-shaped component inventory
+ * from package-lock.json with a content-addressed serial number.
  */
 import * as crypto from 'node:crypto';
 import * as fs from 'node:fs/promises';

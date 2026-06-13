@@ -1,7 +1,7 @@
 {
   "name": "patchproof-mcp",
   "version": "0.1.0",
-  "description": "PatchProof MCP — supply-chain security audit server (dependencies → vulnerabilities → reachability → remediation → verification → evidence) for AI agents.",
+  "description": "Four-tool MCP server for deterministic npm scanning, CycloneDX SBOM generation, dependency auditing, and evidence reporting.",
   "private": true,
   "type": "module",
   "main": "dist/server/index.js",

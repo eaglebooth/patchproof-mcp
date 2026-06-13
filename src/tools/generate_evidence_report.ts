@@ -1,11 +1,4 @@
-/**
- * `generate_evidence_report` MCP tool. Assembles a JSON report
- * (with `schemaVersion`, `generatedAt`, `inputs`, `findings`,
- * `remediation`, `verification`, `limitations`, `redactions`)
- * and a self-contained HTML report (no external assets, inline
- * CSS/JS, accessible markup). AC-2 wires the tool; AC-11
- * implements the JSON + HTML emitters.
- */
+/** End-to-end JSON and self-contained HTML evidence generation. */
 import { z } from 'zod';
 
 import { generateReport } from '../reporting/generator.js';
@@ -30,10 +23,8 @@ export interface GenerateEvidenceReportOutput {
 export const generateEvidenceReportTool: ToolDefinition = {
   name: 'generate_evidence_report',
   description:
-    'Assemble the final evidence report. The JSON form carries schemaVersion, generatedAt, ' +
-    'inputs, findings, reachability, remediation, verification, limitations, and redactions. ' +
-    'The HTML form is self-contained (no external assets, inline CSS/JS, accessible markup) ' +
-    'and renders a stable layout suitable for review and audit.',
+    'Combine the CycloneDX component inventory and deterministic vulnerability audit into JSON ' +
+    'findings, upgrade recommendations, and a self-contained HTML report.',
   inputSchema: generateEvidenceReportInputSchema,
   run: async (ctx: ToolContext, input: unknown): Promise<GenerateEvidenceReportOutput> => {
     const parsed = input as GenerateEvidenceReportInput;

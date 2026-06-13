@@ -53,6 +53,17 @@
         color: #cbd5e1;
       }
       a { color: var(--accent); }
+      button {
+        border: 1px solid #24665e;
+        border-radius: 8px;
+        background: #123b38;
+        padding: 10px 14px;
+        color: var(--text);
+        cursor: pointer;
+      }
+      button:hover { background: #18534e; }
+      .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
+      #status { min-height: 1.5rem; color: var(--accent); }
     </style>
   </head>
   <body>
@@ -75,6 +86,18 @@
       </div>
 
       <h2>Verify the deployment</h2>
+      <p>These controls call the deployed MCP endpoint directly against its bundled fixture.</p>
+      <div class="actions">
+        <button type="button" data-method="list">List MCP tools</button>
+        <button type="button" data-tool="scan_repository">Run repository scan</button>
+        <button type="button" data-tool="generate_sbom">Generate SBOM</button>
+        <button type="button" data-tool="audit_dependencies">Audit dependencies</button>
+        <button type="button" data-tool="generate_evidence_report">Generate evidence</button>
+      </div>
+      <p id="status" role="status"></p>
+      <pre id="output">Select an action to inspect the live JSON-RPC response.</pre>
+
+      <h2>Command-line check</h2>
       <pre>curl -X POST https://YOUR-DEPLOYMENT.vercel.app/api/mcp \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
@@ -85,5 +108,45 @@
         <a href="https://github.com/eaglebooth/patchproof-mcp">GitHub repository</a>.
       </p>
     </main>
+    <script>
+      const output = document.querySelector('#output');
+      const status = document.querySelector('#status');
+      let requestId = 0;
+
+      async function callMcp(message) {
+        status.textContent = 'Calling /api/mcp...';
+        output.textContent = '';
+        try {
+          const response = await fetch('/api/mcp', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json, text/event-stream'
+            },
+            body: JSON.stringify({ jsonrpc: '2.0', id: ++requestId, ...message })
+          });
+          const text = await response.text();
+          let payload = text;
+          try { payload = JSON.stringify(JSON.parse(text), null, 2); } catch {}
+          output.textContent = payload;
+          status.textContent = response.ok ? `HTTP ${response.status}: live MCP response` : `HTTP ${response.status}: request failed`;
+        } catch (error) {
+          status.textContent = 'Network error';
+          output.textContent = error instanceof Error ? error.message : String(error);
+        }
+      }
+
+      document.querySelector('[data-method="list"]').addEventListener('click', () => {
+        void callMcp({ method: 'tools/list' });
+      });
+      for (const button of document.querySelectorAll('[data-tool]')) {
+        button.addEventListener('click', () => {
+          void callMcp({
+            method: 'tools/call',
+            params: { name: button.dataset.tool, arguments: {} }
+          });
+        });
+      }
+    </script>
   </body>
 </html>

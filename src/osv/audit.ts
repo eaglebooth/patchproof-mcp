@@ -1,16 +1,6 @@
 /**
- * OSV audit orchestrator. Used by the `audit_dependencies` tool
- * (AC-2).
- *
- * AC-2 implements the deterministic mock adapter. The mock is a
- * pure in-memory `MOCK_VULNS` map keyed by `name@version`; no
- * `fetch` / `http` / `child_process` calls happen on the mock
- * path, which keeps the test suite free of network dependencies.
- *
- * The `osvMode: 'live'` switch is accepted by the input schema
- * and the live adapter is reserved for a future run; this
- * implementation always resolves the mock table regardless of
- * mode. A later AC will split out a real HTTP client.
+ * Deterministic dependency audit backed by an in-memory table
+ * keyed by name@version. It performs no network requests.
  */
 import * as path from 'node:path';
 
@@ -20,13 +10,13 @@ import type { Dependency, OsvVulnerabilitySummary, Severity } from '../types/ind
 import type { ToolContext } from '../tools/types.js';
 
 export interface AuditDependenciesInput extends RunRepositoryScanInput {
-  readonly osvMode?: 'mock' | 'live' | undefined;
+  readonly osvMode?: 'mock' | undefined;
   readonly ecosystem?: 'npm' | undefined;
 }
 
 export interface AuditDependenciesOutput {
   readonly repoRoot: string;
-  readonly osvMode: 'mock' | 'live';
+  readonly osvMode: 'mock';
   readonly dependencies: ReadonlyArray<Dependency>;
   readonly vulnerabilities: ReadonlyArray<OsvVulnerabilitySummary>;
 }
@@ -94,8 +84,6 @@ export async function auditDependencies(
   input: AuditDependenciesInput,
 ): Promise<AuditDependenciesOutput> {
   const root = resolveRepoRoot(ctx, input.repoRoot);
-  const mode = input.osvMode ?? 'mock';
-
   let entries: ReadonlyArray<ReturnType<typeof parseNpmLockfile>[number]> = [];
   try {
     const fs = await import('node:fs');
@@ -135,8 +123,7 @@ export async function auditDependencies(
 
   return {
     repoRoot: root,
-    // Mock-only path: `live` is reserved for a future run.
-    osvMode: mode === 'live' ? 'live' : 'mock',
+    osvMode: 'mock',
     dependencies,
     vulnerabilities,
   };

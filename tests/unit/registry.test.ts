@@ -4,7 +4,7 @@ import { buildServer } from '../../src/server/registry.js';
 import { TOOL_NAMES, tools } from '../../src/tools/index.js';
 import { getDefaultLogger, LoggerImpl, StderrJsonSink } from '../../src/utils/logger.js';
 
-describe('buildServer (scaffold)', () => {
+describe('buildServer', () => {
   it('publishes the complete four-tool MVP surface', () => {
     expect(TOOL_NAMES).toEqual([
       'scan_repository',

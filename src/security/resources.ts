@@ -1,8 +1,4 @@
-/**
- * Resource governor. The full implementation lands in AC-13; the
- * scaffold exposes the constructor and the same public surface so
- * later ACs can import it without changes.
- */
+/** Enforce traversal limits for files, bytes, depth, and wall-clock time. */
 import { ResourceLimitError } from './errors.js';
 
 export interface ResourceLimits {

@@ -1,13 +1,15 @@
+import * as path from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
 import { isInside, safeResolve, DEFAULT_IGNORE_DIRS } from '../../src/security/paths.js';
 import { PathSafetyError } from '../../src/security/errors.js';
 
-describe('safeResolve (scaffold)', () => {
+describe('safeResolve', () => {
   const root = '/tmp/repo';
 
   it('resolves a safe candidate', () => {
-    expect(safeResolve(root, 'src/index.ts')).toBe('/tmp/repo/src/index.ts');
+    expect(safeResolve(root, 'src/index.ts')).toBe(path.resolve(root, 'src/index.ts'));
   });
 
   it('rejects null bytes', () => {

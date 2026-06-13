@@ -1,11 +1,4 @@
-/**
- * `scan_repository` MCP tool. Walks a repository root safely and
- * emits a typed set of findings (vulnerabilities, secrets,
- * malformed inputs). AC-2 registers the tool; the full
- * implementation walks the tree via the ResourceGovernor and
- * dispatches to the parsers/scanners/reporting modules (AC-4 +
- * AC-7 + AC-12 + AC-13).
- */
+/** Bounded repository traversal and file statistics. */
 import { z } from 'zod';
 
 import { runRepositoryScan } from '../scanners/files.js';
@@ -35,9 +28,8 @@ export interface ScanRepositoryOutput {
 export const scanRepositoryTool: ToolDefinition = {
   name: 'scan_repository',
   description:
-    'Walk a repository root, parse its manifest and lockfile, and return a typed set of findings ' +
-    '(vulnerabilities, secrets, malformed inputs). Safe by default: paths are resolved through ' +
-    'security/paths.ts and the run is bounded by ResourceGovernor.',
+    'Walk a repository root and return bounded file-count and byte-count statistics. Paths are ' +
+    'resolved inside the authorized root and traversal is limited by file, byte, and depth caps.',
   inputSchema: scanRepositoryInputSchema,
   run: async (ctx: ToolContext, input: unknown): Promise<ScanRepositoryOutput> => {
     const parsed = input as ScanRepositoryInput;

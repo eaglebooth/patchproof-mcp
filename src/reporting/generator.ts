@@ -1,6 +1,5 @@
 /**
- * Evidence report generator. Used by the `generate_evidence_report`
- * tool (AC-2) and the demo API (AC-19).
+ * Evidence report generator used by the MCP tool and demo API.
  *
  * The report composes the implemented SBOM and deterministic
  * vulnerability audit into one inspectable JSON/HTML artifact.
