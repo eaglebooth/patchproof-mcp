@@ -37,9 +37,10 @@ export async function startHttp(opts: StartHttpOptions): Promise<RunningHttpServ
 
   return {
     url,
-    close: () => new Promise<void>((resolve, reject) => {
-      httpServer.close((error) => error ? reject(error) : resolve());
-    }),
+    close: () =>
+      new Promise<void>((resolve, reject) => {
+        httpServer.close((error) => (error ? reject(error) : resolve()));
+      }),
   };
 }
 
@@ -70,14 +71,16 @@ async function handleRequest(
     if (!res.headersSent) {
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({
-        jsonrpc: '2.0',
-        id: null,
-        error: {
-          code: -32603,
-          message: error instanceof Error ? error.message : 'Internal server error',
-        },
-      }));
+      res.end(
+        JSON.stringify({
+          jsonrpc: '2.0',
+          id: null,
+          error: {
+            code: -32603,
+            message: error instanceof Error ? error.message : 'Internal server error',
+          },
+        }),
+      );
     }
   } finally {
     await transport.close().catch(() => undefined);

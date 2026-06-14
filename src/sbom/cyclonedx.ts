@@ -7,7 +7,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 
 import { resolveRepoRoot, type RunRepositoryScanInput } from '../scanners/files.js';
-import { parseNpmLockfile } from '../parsers/lockfile.js';
+import { parseNpmLockfileDetailed, type ParsedLockfileEntry } from '../parsers/lockfile.js';
 import type { ToolContext } from '../tools/types.js';
 
 export interface BuildSbomInput extends RunRepositoryScanInput {
@@ -19,8 +19,11 @@ export interface BuildSbomOutput {
   readonly format: 'cyclonedx';
   readonly schemaVersion: '1.5';
   readonly serialNumber: string;
+  readonly lockfileStatus: LockfileStatus;
   readonly components: ReadonlyArray<SbomComponent>;
 }
+
+export type LockfileStatus = 'ok' | 'missing' | 'malformed' | 'unreadable';
 
 export interface SbomComponent {
   readonly type: 'library';
@@ -43,11 +46,15 @@ export async function buildCycloneDxSbom(
   const lockfilePath = path.join(root, LOCKFILE_BASENAME);
 
   let lockfileText = '';
+  let lockfileStatus: LockfileStatus = 'missing';
   let components: ReadonlyArray<SbomComponent> = [];
   try {
     lockfileText = await fs.readFile(lockfilePath, 'utf8');
-    components = toComponents(parseNpmLockfile(lockfileText));
-  } catch {
+    const parsed = parseNpmLockfileDetailed(lockfileText);
+    lockfileStatus = parsed.status;
+    components = toComponents(parsed.entries);
+  } catch (error: unknown) {
+    lockfileStatus = isMissingFile(error) ? 'missing' : 'unreadable';
     // No lockfile or unreadable lockfile: emit an SBOM with no
     // components but a content-addressed serial so downstream
     // tools can still diff by `serialNumber`.
@@ -58,11 +65,12 @@ export async function buildCycloneDxSbom(
     format: 'cyclonedx',
     schemaVersion: CYCLONEDX_VERSION,
     serialNumber: `urn:uuid:${contentAddressedSerial(lockfileText)}`,
+    lockfileStatus,
     components,
   };
 }
 
-function toComponents(entries: ReadonlyArray<ReturnType<typeof parseNpmLockfile>[number]>): ReadonlyArray<SbomComponent> {
+function toComponents(entries: ReadonlyArray<ParsedLockfileEntry>): ReadonlyArray<SbomComponent> {
   const out: SbomComponent[] = entries.map((e) => ({
     type: 'library' as const,
     name: e.name,
@@ -88,6 +96,16 @@ function contentAddressedSerial(lockfileText: string): string {
   const chars = hex.split('');
   chars[12] = '4';
   chars[16] = '8';
-  const groups = [chars.slice(0, 8), chars.slice(8, 12), chars.slice(12, 16), chars.slice(16, 20), chars.slice(20, 32)];
+  const groups = [
+    chars.slice(0, 8),
+    chars.slice(8, 12),
+    chars.slice(12, 16),
+    chars.slice(16, 20),
+    chars.slice(20, 32),
+  ];
   return groups.map((g) => g.join('')).join('-');
+}
+
+function isMissingFile(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && 'code' in error && error.code === 'ENOENT';
 }

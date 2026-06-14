@@ -16,6 +16,7 @@ export type AuditDependenciesInput = z.infer<typeof auditDependenciesInputSchema
 export interface AuditDependenciesOutput {
   readonly repoRoot: string;
   readonly osvMode: 'mock';
+  readonly lockfileStatus: 'ok' | 'missing' | 'malformed' | 'unreadable';
   readonly dependencies: ReadonlyArray<Dependency>;
   readonly vulnerabilities: ReadonlyArray<OsvVulnerabilitySummary>;
 }

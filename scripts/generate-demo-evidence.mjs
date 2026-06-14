@@ -33,10 +33,9 @@ async function generateArtifacts(name, repoPath, destination, writeLegacyNames) 
 
   await mkdir(destination, { recursive: true });
   const prefix = writeLegacyNames ? 'demo-report' : 'report';
-  await writeFile(
-    resolve(destination, `${prefix}.json`),
-    `${JSON.stringify(report, null, 2)}\n`,
-  );
+  await writeFile(resolve(destination, `${prefix}.json`), `${JSON.stringify(report, null, 2)}\n`);
   await writeFile(resolve(destination, `${prefix}.html`), renderHtml(report));
-  process.stdout.write(`Generated ${name}: ${report.findings.length} findings, risk ${report.riskSummary.highestScore}\n`);
+  process.stdout.write(
+    `Generated ${name}: ${report.findings.length} findings, risk ${report.riskSummary.highestScore}\n`,
+  );
 }

@@ -6,14 +6,22 @@
     "config": {
       "ecosystem": "npm",
       "auditMode": "mock",
+      "lockfileStatus": "missing",
       "sbomSchemaVersion": "1.5",
       "sbomSerialNumber": "urn:uuid:e3b0c442-98fc-4c14-8afb-f4c8996fb924",
       "componentCount": 0,
       "dependencyCount": 0,
-      "vulnerabilityCount": 0
+      "vulnerabilityCount": 1
     }
   },
-  "findings": [],
+  "findings": [
+    {
+      "id": "lockfile:missing",
+      "kind": "missing",
+      "message": "package-lock.json is missing; dependency evidence could not be generated.",
+      "severity": "medium"
+    }
+  ],
   "riskSummary": {
     "highestScore": 0,
     "averageScore": 0,
@@ -30,7 +38,7 @@
   "limitations": [
     "Vulnerability matching uses a deterministic local fixture table and does not query the live OSV service.",
     "Reachability analysis and verification command execution are not implemented in this four-tool MVP.",
-    "No readable package-lock.json was found, so the SBOM and dependency audit are empty."
+    "package-lock.json status is missing; dependency-derived output is incomplete."
   ],
   "redactions": []
 }

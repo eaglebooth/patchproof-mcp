@@ -20,20 +20,14 @@ export default async function handler(req: VercelRequest, res: ServerResponse): 
     return;
   }
 
-  if (req.method === 'DELETE') {
-    res.statusCode = 204;
-    res.end();
-    return;
-  }
-
-  if (req.method !== 'POST') {
+  if (req.method !== 'POST' && req.method !== 'DELETE') {
     res.statusCode = 405;
     res.setHeader('Allow', 'POST, DELETE');
     res.end('Method Not Allowed');
     return;
   }
 
-  const body = lockToolCallToDemoFixture(req.body);
+  const body = req.method === 'POST' ? lockToolCallToDemoFixture(req.body) : undefined;
   const transport = new StreamableHTTPServerTransport({
     enableJsonResponse: true,
   });

@@ -16,6 +16,7 @@ export interface GenerateSbomOutput {
   readonly format: 'cyclonedx';
   readonly schemaVersion: '1.5';
   readonly serialNumber: string;
+  readonly lockfileStatus: 'ok' | 'missing' | 'malformed' | 'unreadable';
   readonly components: ReadonlyArray<{
     readonly type: 'library';
     readonly name: string;

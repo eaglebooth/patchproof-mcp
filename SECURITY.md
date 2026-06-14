@@ -5,10 +5,10 @@ vulnerabilities in the tool itself seriously.
 
 ## Supported versions
 
-| Version | Supported |
-| --- | --- |
-| `main` (current development) | ✅ |
-| Tagged releases | ✅ best-effort, 90 days |
+| Version                      | Supported               |
+| ---------------------------- | ----------------------- |
+| `main` (current development) | ✅                      |
+| Tagged releases              | ✅ best-effort, 90 days |
 
 ## Reporting a vulnerability
 

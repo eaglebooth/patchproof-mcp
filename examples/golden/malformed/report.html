@@ -18,7 +18,7 @@
 <p class="meta">schemaVersion: 1.0.0 &middot; generatedAt: 2026-06-13T00:00:00.000Z</p>
 <section class="summary" aria-label="Audit summary">
   <div class="metric"><strong>0</strong>SBOM components</div>
-  <div class="metric"><strong>0</strong>vulnerabilities</div>
+  <div class="metric"><strong>1</strong>vulnerabilities</div>
   <div class="metric"><strong>0</strong>highest risk</div>
   <div class="metric"><strong>0</strong>remediations</div>
 </section>
@@ -30,14 +30,22 @@
     &quot;config&quot;: {
       &quot;ecosystem&quot;: &quot;npm&quot;,
       &quot;auditMode&quot;: &quot;mock&quot;,
+      &quot;lockfileStatus&quot;: &quot;malformed&quot;,
       &quot;sbomSchemaVersion&quot;: &quot;1.5&quot;,
       &quot;sbomSerialNumber&quot;: &quot;urn:uuid:31533537-49a2-41bf-87dc-114f7a6c9348&quot;,
       &quot;componentCount&quot;: 0,
       &quot;dependencyCount&quot;: 0,
-      &quot;vulnerabilityCount&quot;: 0
+      &quot;vulnerabilityCount&quot;: 1
     }
   },
-  &quot;findings&quot;: [],
+  &quot;findings&quot;: [
+    {
+      &quot;id&quot;: &quot;lockfile:malformed&quot;,
+      &quot;kind&quot;: &quot;malformed&quot;,
+      &quot;message&quot;: &quot;package-lock.json is malformed and could not be parsed.&quot;,
+      &quot;severity&quot;: &quot;medium&quot;
+    }
+  ],
   &quot;riskSummary&quot;: {
     &quot;highestScore&quot;: 0,
     &quot;averageScore&quot;: 0,
@@ -54,7 +62,7 @@
   &quot;limitations&quot;: [
     &quot;Vulnerability matching uses a deterministic local fixture table and does not query the live OSV service.&quot;,
     &quot;Reachability analysis and verification command execution are not implemented in this four-tool MVP.&quot;,
-    &quot;No readable package-lock.json was found, so the SBOM and dependency audit are empty.&quot;
+    &quot;package-lock.json status is malformed; dependency-derived output is incomplete.&quot;
   ],
   &quot;redactions&quot;: []
 }</pre>

@@ -14,18 +14,36 @@
         --muted: #9aa8be;
         --accent: #2dd4bf;
       }
-      * { box-sizing: border-box; }
+      * {
+        box-sizing: border-box;
+      }
       body {
         margin: 0;
         min-height: 100vh;
         background: radial-gradient(circle at top, #17314a 0, var(--bg) 48%);
         color: var(--text);
-        font: 16px/1.55 Inter, ui-sans-serif, system-ui, sans-serif;
+        font:
+          16px/1.55 Inter,
+          ui-sans-serif,
+          system-ui,
+          sans-serif;
       }
-      main { width: min(920px, calc(100% - 32px)); margin: 0 auto; padding: 64px 0 96px; }
-      h1 { margin: 0; font-size: clamp(40px, 8vw, 72px); letter-spacing: -0.05em; }
-      h2 { margin: 40px 0 12px; }
-      p { color: var(--muted); }
+      main {
+        width: min(920px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 64px 0 96px;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(40px, 8vw, 72px);
+        letter-spacing: -0.05em;
+      }
+      h2 {
+        margin: 40px 0 12px;
+      }
+      p {
+        color: var(--muted);
+      }
       .badge {
         display: inline-block;
         margin-bottom: 18px;
@@ -34,16 +52,29 @@
         padding: 5px 12px;
         color: var(--accent);
       }
-      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 14px;
+      }
       .card {
         border: 1px solid var(--border);
         border-radius: 12px;
         background: color-mix(in srgb, var(--panel) 92%, transparent);
         padding: 18px;
       }
-      .card strong { display: block; margin-bottom: 6px; color: var(--accent); }
-      code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
-      code { color: var(--accent); }
+      .card strong {
+        display: block;
+        margin-bottom: 6px;
+        color: var(--accent);
+      }
+      code,
+      pre {
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      }
+      code {
+        color: var(--accent);
+      }
       pre {
         overflow-x: auto;
         border: 1px solid var(--border);
@@ -52,7 +83,9 @@
         padding: 18px;
         color: #cbd5e1;
       }
-      a { color: var(--accent); }
+      a {
+        color: var(--accent);
+      }
       button {
         border: 1px solid #24665e;
         border-radius: 8px;
@@ -61,9 +94,19 @@
         color: var(--text);
         cursor: pointer;
       }
-      button:hover { background: #18534e; }
-      .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
-      #status { min-height: 1.5rem; color: var(--accent); }
+      button:hover {
+        background: #18534e;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 16px 0;
+      }
+      #status {
+        min-height: 1.5rem;
+        color: var(--accent);
+      }
       .risk {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -76,7 +119,11 @@
         background: #0b1220;
         padding: 12px;
       }
-      .risk strong { display: block; color: var(--accent); font-size: 1.4rem; }
+      .risk strong {
+        display: block;
+        color: var(--accent);
+        font-size: 1.4rem;
+      }
     </style>
   </head>
   <body>
@@ -84,8 +131,8 @@
       <span class="badge">Built with CyOps Humanize + MiniMax M3</span>
       <h1>PatchProof MCP</h1>
       <p>
-        A focused four-tool MCP server for reproducible npm supply-chain
-        inspection. The public deployment runs against a safe bundled fixture.
+        A focused four-tool MCP server for reproducible npm supply-chain inspection. The public deployment runs against
+        a safe bundled fixture.
       </p>
 
       <h2>Live MCP endpoint</h2>
@@ -100,9 +147,8 @@
 
       <h2>Transparent risk model</h2>
       <p>
-        Findings are ranked from 0–100 using visible factors: severity or CVSS,
-        production versus development scope, direct versus transitive depth,
-        and fix availability. No hidden model or network lookup affects ranking.
+        Findings are ranked from 0–100 using visible factors: severity or CVSS, production versus development scope,
+        direct versus transitive depth, and fix availability. No hidden model or network lookup affects ranking.
       </p>
       <div class="risk">
         <div><strong>0–34</strong>Low</div>
@@ -124,10 +170,12 @@
       <pre id="output">Select an action to inspect the live JSON-RPC response.</pre>
 
       <h2>Command-line check</h2>
-      <pre>curl -X POST https://YOUR-DEPLOYMENT.vercel.app/api/mcp \
+      <pre>
+curl -X POST https://YOUR-DEPLOYMENT.vercel.app/api/mcp \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'</pre>
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'</pre
+      >
 
       <p>
         Source and CyOps evidence:
@@ -147,15 +195,19 @@
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Accept: 'application/json, text/event-stream'
+              Accept: 'application/json, text/event-stream',
             },
-            body: JSON.stringify({ jsonrpc: '2.0', id: ++requestId, ...message })
+            body: JSON.stringify({ jsonrpc: '2.0', id: ++requestId, ...message }),
           });
           const text = await response.text();
           let payload = text;
-          try { payload = JSON.stringify(JSON.parse(text), null, 2); } catch {}
+          try {
+            payload = JSON.stringify(JSON.parse(text), null, 2);
+          } catch {}
           output.textContent = payload;
-          status.textContent = response.ok ? `HTTP ${response.status}: live MCP response` : `HTTP ${response.status}: request failed`;
+          status.textContent = response.ok
+            ? `HTTP ${response.status}: live MCP response`
+            : `HTTP ${response.status}: request failed`;
         } catch (error) {
           status.textContent = 'Network error';
           output.textContent = error instanceof Error ? error.message : String(error);
@@ -169,7 +221,7 @@
         button.addEventListener('click', () => {
           void callMcp({
             method: 'tools/call',
-            params: { name: button.dataset.tool, arguments: {} }
+            params: { name: button.dataset.tool, arguments: {} },
           });
         });
       }

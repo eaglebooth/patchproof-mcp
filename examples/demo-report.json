@@ -6,6 +6,7 @@
     "config": {
       "ecosystem": "npm",
       "auditMode": "mock",
+      "lockfileStatus": "ok",
       "sbomSchemaVersion": "1.5",
       "sbomSerialNumber": "urn:uuid:5495ce3a-61df-41af-8975-ff0e42b4cb4e",
       "componentCount": 2,

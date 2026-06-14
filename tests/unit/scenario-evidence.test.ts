@@ -8,8 +8,8 @@ const scenarios = [
   { name: 'safe', findings: 0, risk: 0 },
   { name: 'vulnerable', findings: 2, risk: 61 },
   { name: 'dev-transitive', findings: 1, risk: 23 },
-  { name: 'malformed', findings: 0, risk: 0 },
-  { name: 'missing', findings: 0, risk: 0 },
+  { name: 'malformed', findings: 1, risk: 0, kind: 'malformed' },
+  { name: 'missing', findings: 1, risk: 0, kind: 'missing' },
 ] as const;
 
 describe('scenario evidence', () => {
@@ -23,6 +23,10 @@ describe('scenario evidence', () => {
 
       expect(result.report.findings).toHaveLength(scenario.findings);
       expect(result.report.riskSummary.highestScore).toBe(scenario.risk);
+      if ('kind' in scenario) {
+        expect(result.report.findings[0]?.kind).toBe(scenario.kind);
+        expect(result.report.inputs.config['lockfileStatus']).toBe(scenario.name);
+      }
       expect(result.html).toContain('PatchProof Evidence Report');
     });
   }

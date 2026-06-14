@@ -29,9 +29,10 @@ export function scoreDependencyRisk(
   dependency: Dependency,
   vulnerability: OsvVulnerabilitySummary,
 ): RiskAssessment {
-  const severity = vulnerability.cvssScore === undefined
-    ? SEVERITY_SCORE[vulnerability.severity]
-    : clamp(vulnerability.cvssScore * 10, 0, 100);
+  const severity =
+    vulnerability.cvssScore === undefined
+      ? SEVERITY_SCORE[vulnerability.severity]
+      : clamp(vulnerability.cvssScore * 10, 0, 100);
   const dependencyScope = dependency.isDev ? 0.65 : 1;
   const dependencyDepth = dependency.isTransitive ? 0.8 : 1;
   const fixAvailability = vulnerability.fixedVersions.length > 0 ? 0.85 : 1;
@@ -57,9 +58,7 @@ export function scoreDependencyRisk(
   };
 }
 
-export function summarizeRisk(
-  assessments: ReadonlyArray<RiskAssessment>,
-): {
+export function summarizeRisk(assessments: ReadonlyArray<RiskAssessment>): {
   readonly highestScore: number;
   readonly averageScore: number;
   readonly counts: Readonly<Record<RiskBand, number>>;

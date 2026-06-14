@@ -29,12 +29,14 @@ describe('structured logger', () => {
     logger.debug('hidden');
     logger.child({ workflow: 'audit' }).info('visible', { count: 2 });
 
-    expect(sink.entries).toEqual([{
-      level: 'info',
-      ts: '2026-06-14T00:00:00.000Z',
-      msg: 'visible',
-      fields: { service: 'patchproof', workflow: 'audit', count: 2 },
-    }]);
+    expect(sink.entries).toEqual([
+      {
+        level: 'info',
+        ts: '2026-06-14T00:00:00.000Z',
+        msg: 'visible',
+        fields: { service: 'patchproof', workflow: 'audit', count: 2 },
+      },
+    ]);
   });
 
   it('writes redacted JSON and serializes errors and bigint', () => {

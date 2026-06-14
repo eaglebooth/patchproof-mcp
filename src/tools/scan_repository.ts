@@ -21,6 +21,8 @@ export interface ScanRepositoryOutput {
   readonly filesScanned: number;
   readonly bytesRead: number;
   readonly durationMs: number;
+  readonly truncated: boolean;
+  readonly truncationReason?: string;
   readonly findings: ReadonlyArray<Finding>;
   readonly ignoreDirs: ReadonlyArray<string>;
 }

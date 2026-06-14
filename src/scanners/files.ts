@@ -8,7 +8,7 @@ import * as nodeFs from 'node:fs';
 import * as path from 'node:path';
 
 import { ResourceGovernor } from '../security/resources.js';
-import { InvalidInputError } from '../security/errors.js';
+import { InvalidInputError, ResourceLimitError } from '../security/errors.js';
 import { safeResolve, DEFAULT_IGNORE_DIRS } from '../security/paths.js';
 import { systemClock } from '../utils/clock.js';
 import type { Finding } from '../types/index.js';
@@ -28,6 +28,8 @@ export interface RunRepositoryScanOutput {
   readonly filesScanned: number;
   readonly bytesRead: number;
   readonly durationMs: number;
+  readonly truncated: boolean;
+  readonly truncationReason?: string;
   readonly findings: ReadonlyArray<Finding>;
   readonly ignoreDirs: ReadonlyArray<string>;
 }
@@ -82,17 +84,19 @@ export async function runRepositoryScan(
     filesScanned: stats.files,
     bytesRead: stats.bytes,
     durationMs,
+    truncated: stats.truncated,
+    ...(stats.truncationReason ? { truncationReason: stats.truncationReason } : {}),
     findings: [],
     ignoreDirs: SCAN_IGNORE_DIRS,
   };
 }
 
 export function resolveRepoRoot(ctx: ToolContext, override: string | undefined): string {
-  const candidate = typeof override === 'string' && override.length > 0 ? override : ctx.repoRoot;
-  if (typeof candidate !== 'string' || candidate.length === 0) {
+  if (typeof ctx.repoRoot !== 'string' || ctx.repoRoot.length === 0) {
     throw new InvalidInputError('runRepositoryScan: repoRoot is required', { ctx: 'no-root' });
   }
-  return safeResolve(candidate, '.');
+  const candidate = typeof override === 'string' && override.length > 0 ? override : '.';
+  return safeResolve(ctx.repoRoot, candidate);
 }
 
 interface WalkOptions {
@@ -107,13 +111,11 @@ interface WalkOptions {
 interface WalkStats {
   files: number;
   bytes: number;
+  truncated: boolean;
+  truncationReason?: string;
 }
 
-async function walk(
-  currentDir: string,
-  depth: number,
-  opts: WalkOptions,
-): Promise<WalkStats> {
+async function walk(currentDir: string, depth: number, opts: WalkOptions): Promise<WalkStats> {
   opts.governor.checkDepth(depth);
   opts.governor.checkTime();
 
@@ -121,21 +123,22 @@ async function walk(
   try {
     entries = await fs.readdir(currentDir, { withFileTypes: true });
   } catch {
-    return { files: 0, bytes: 0 };
+    return { files: 0, bytes: 0, truncated: false };
   }
 
-  const stats: WalkStats = { files: 0, bytes: 0 };
+  const stats: WalkStats = { files: 0, bytes: 0, truncated: false };
   for (const entry of entries) {
-    if (shouldSkipEntry(entry, opts)) continue;
-    const childPath = path.join(currentDir, entry.name);
-    if (entry.isDirectory()) {
-      const sub = await walk(childPath, depth + 1, opts);
-      stats.files += sub.files;
-      stats.bytes += sub.bytes;
-      continue;
-    }
-    if (entry.isFile()) {
-      try {
+    try {
+      opts.governor.checkTime();
+      if (shouldSkipEntry(entry, opts)) continue;
+      const childPath = path.join(currentDir, entry.name);
+      if (entry.isDirectory()) {
+        const sub = await walk(childPath, depth + 1, opts);
+        mergeStats(stats, sub);
+        if (sub.truncated) break;
+        continue;
+      }
+      if (entry.isFile()) {
         opts.governor.checkFile();
         const size = await statFileSize(childPath);
         if (size >= 0) {
@@ -143,33 +146,43 @@ async function walk(
           stats.files += 1;
           stats.bytes += size;
         }
-      } catch {
-        // Resource limit hit; stop counting further files but
-        // don't throw — the caller may still want the partial
-        // counts via the typed output.
-        break;
+        continue;
       }
-      continue;
-    }
-    if (entry.isSymbolicLink() && opts.followSymlinks) {
-      try {
+      if (entry.isSymbolicLink() && opts.followSymlinks) {
         const real = nodeFs.realpathSync(childPath);
         if (!isInsideRoot(opts.root, real) || opts.visitedDirectories.has(real)) continue;
         opts.visitedDirectories.add(real);
         const sub = await walk(real, depth + 1, opts);
-        stats.files += sub.files;
-        stats.bytes += sub.bytes;
-      } catch {
-        // ignore unreadable symlink targets
+        mergeStats(stats, sub);
+        if (sub.truncated) break;
       }
+    } catch (error: unknown) {
+      if (error instanceof ResourceLimitError) {
+        stats.truncated = true;
+        stats.truncationReason = error.message;
+        break;
+      }
+      // Ignore unreadable files and symlink targets.
     }
   }
   return stats;
 }
 
+function mergeStats(target: WalkStats, source: WalkStats): void {
+  target.files += source.files;
+  target.bytes += source.bytes;
+  if (source.truncated) {
+    target.truncated = true;
+    if (source.truncationReason) target.truncationReason = source.truncationReason;
+  }
+}
+
 function isInsideRoot(root: string, candidate: string): boolean {
   const relative = path.relative(root, candidate);
-  return relative === '' || (relative.length > 0 && !relative.startsWith('..') && !path.isAbsolute(relative));
+  return (
+    relative === '' ||
+    (relative.length > 0 && !relative.startsWith('..') && !path.isAbsolute(relative))
+  );
 }
 
 function shouldSkipEntry(entry: Dirent, opts: WalkOptions): boolean {

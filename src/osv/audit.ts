@@ -2,10 +2,12 @@
  * Deterministic dependency audit backed by an in-memory table
  * keyed by name@version. It performs no network requests.
  */
+import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 
 import { resolveRepoRoot, type RunRepositoryScanInput } from '../scanners/files.js';
-import { parseNpmLockfile } from '../parsers/lockfile.js';
+import { parseNpmLockfileDetailed, type ParsedLockfileEntry } from '../parsers/lockfile.js';
+import type { LockfileStatus } from '../sbom/cyclonedx.js';
 import type { Dependency, OsvVulnerabilitySummary, Severity } from '../types/index.js';
 import type { ToolContext } from '../tools/types.js';
 
@@ -17,6 +19,7 @@ export interface AuditDependenciesInput extends RunRepositoryScanInput {
 export interface AuditDependenciesOutput {
   readonly repoRoot: string;
   readonly osvMode: 'mock';
+  readonly lockfileStatus: LockfileStatus;
   readonly dependencies: ReadonlyArray<Dependency>;
   readonly vulnerabilities: ReadonlyArray<OsvVulnerabilitySummary>;
 }
@@ -39,7 +42,10 @@ interface MockVuln {
  * would return. Add or remove entries here to expand the
  * coverage; the rest of the pipeline does not need to change.
  */
-export const MOCK_VULNS: ReadonlyMap<string, ReadonlyArray<MockVuln>> = new Map<string, ReadonlyArray<MockVuln>>([
+export const MOCK_VULNS: ReadonlyMap<string, ReadonlyArray<MockVuln>> = new Map<
+  string,
+  ReadonlyArray<MockVuln>
+>([
   [
     'lodash@4.17.20',
     [
@@ -84,12 +90,15 @@ export async function auditDependencies(
   input: AuditDependenciesInput,
 ): Promise<AuditDependenciesOutput> {
   const root = resolveRepoRoot(ctx, input.repoRoot);
-  let entries: ReadonlyArray<ReturnType<typeof parseNpmLockfile>[number]> = [];
+  let entries: ReadonlyArray<ParsedLockfileEntry> = [];
+  let lockfileStatus: LockfileStatus = 'missing';
   try {
-    const fs = await import('node:fs');
-    const lockfileText = fs.readFileSync(path.join(root, LOCKFILE_BASENAME), 'utf8');
-    entries = parseNpmLockfile(lockfileText);
-  } catch {
+    const lockfileText = await fs.readFile(path.join(root, LOCKFILE_BASENAME), 'utf8');
+    const parsed = parseNpmLockfileDetailed(lockfileText);
+    entries = parsed.entries;
+    lockfileStatus = parsed.status;
+  } catch (error: unknown) {
+    lockfileStatus = isMissingFile(error) ? 'missing' : 'unreadable';
     entries = [];
   }
 
@@ -124,7 +133,12 @@ export async function auditDependencies(
   return {
     repoRoot: root,
     osvMode: 'mock',
+    lockfileStatus,
     dependencies,
     vulnerabilities,
   };
+}
+
+function isMissingFile(error: unknown): boolean {
+  return typeof error === 'object' && error !== null && 'code' in error && error.code === 'ENOENT';
 }

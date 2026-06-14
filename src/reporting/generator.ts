@@ -15,7 +15,6 @@ import type { ToolContext } from '../tools/types.js';
 
 export interface GenerateEvidenceReportInput extends RunRepositoryScanInput {
   readonly format?: 'json' | 'html' | 'both' | undefined;
-  readonly includeHtmlPreview?: boolean | undefined;
 }
 
 export interface GenerateEvidenceReportOutput {
@@ -35,14 +34,16 @@ export async function generateReport(
     buildCycloneDxSbom(ctx, { repoRoot: root }),
     auditDependencies(ctx, { repoRoot: root, ecosystem: 'npm', osvMode: 'mock' }),
   ]);
-  const findings = toFindings(audit.dependencies);
+  const findings = [...toLockfileFindings(sbom.lockfileStatus), ...toFindings(audit.dependencies)];
   const remediation = toRemediation(findings);
   const limitations = [
     'Vulnerability matching uses a deterministic local fixture table and does not query the live OSV service.',
     'Reachability analysis and verification command execution are not implemented in this four-tool MVP.',
   ];
-  if (sbom.components.length === 0) {
-    limitations.push('No readable package-lock.json was found, so the SBOM and dependency audit are empty.');
+  if (sbom.lockfileStatus !== 'ok') {
+    limitations.push(
+      `package-lock.json status is ${sbom.lockfileStatus}; dependency-derived output is incomplete.`,
+    );
   }
   const report: EvidenceReport = {
     schemaVersion: SCHEMA_VERSION,
@@ -52,6 +53,7 @@ export async function generateReport(
       config: {
         ecosystem: 'npm',
         auditMode: audit.osvMode,
+        lockfileStatus: sbom.lockfileStatus,
         sbomSchemaVersion: sbom.schemaVersion,
         sbomSerialNumber: sbom.serialNumber,
         componentCount: sbom.components.length,
@@ -60,14 +62,19 @@ export async function generateReport(
       },
     },
     findings,
-    riskSummary: summarizeRisk(findings.flatMap((finding) => finding.risk ? [finding.risk] : [])),
+    riskSummary: summarizeRisk(findings.flatMap((finding) => (finding.risk ? [finding.risk] : []))),
     reachability: [],
     remediation,
     verification: [],
     limitations,
     redactions: [],
   };
-  const out: { repoRoot: string; format: 'json' | 'html' | 'both'; report: EvidenceReport; html?: string } = {
+  const out: {
+    repoRoot: string;
+    format: 'json' | 'html' | 'both';
+    report: EvidenceReport;
+    html?: string;
+  } = {
     repoRoot: root,
     format,
     report,
@@ -76,6 +83,33 @@ export async function generateReport(
     out.html = renderHtml(report);
   }
   return out;
+}
+
+function toLockfileFindings(
+  status: Awaited<ReturnType<typeof buildCycloneDxSbom>>['lockfileStatus'],
+): Finding[] {
+  if (status === 'ok') return [];
+  if (status === 'missing') {
+    return [
+      {
+        id: 'lockfile:missing',
+        kind: 'missing',
+        message: 'package-lock.json is missing; dependency evidence could not be generated.',
+        severity: 'medium',
+      },
+    ];
+  }
+  return [
+    {
+      id: `lockfile:${status}`,
+      kind: 'malformed',
+      message:
+        status === 'malformed'
+          ? 'package-lock.json is malformed and could not be parsed.'
+          : 'package-lock.json exists but could not be read.',
+      severity: 'medium',
+    },
+  ];
 }
 
 function toFindings(
@@ -94,7 +128,9 @@ function toFindings(
           aliases: vulnerability.aliases ?? [],
           summary: vulnerability.summary,
           severity: vulnerability.severity,
-          ...(typeof vulnerability.cvssScore === 'number' ? { cvssScore: vulnerability.cvssScore } : {}),
+          ...(typeof vulnerability.cvssScore === 'number'
+            ? { cvssScore: vulnerability.cvssScore }
+            : {}),
           fixedVersions: vulnerability.fixedVersions,
         },
         message: `${dependency.name}@${dependency.version}: ${vulnerability.summary}`,
@@ -104,7 +140,9 @@ function toFindings(
           aliases: vulnerability.aliases ?? [],
           summary: vulnerability.summary,
           severity: vulnerability.severity,
-          ...(typeof vulnerability.cvssScore === 'number' ? { cvssScore: vulnerability.cvssScore } : {}),
+          ...(typeof vulnerability.cvssScore === 'number'
+            ? { cvssScore: vulnerability.cvssScore }
+            : {}),
           fixedVersions: vulnerability.fixedVersions,
         }),
       });
@@ -121,15 +159,17 @@ function toRemediation(findings: ReadonlyArray<Finding>): Remediation[] {
     const dependency = finding.dependency;
     const recommendedVersion = finding.vulnerability?.fixedVersions[0];
     if (!dependency || !recommendedVersion) return [];
-    return [{
-      package: dependency.name,
-      currentVersion: dependency.version,
-      recommendedVersion,
-      breakingChangeRisk: 'low' as const,
-      affectedFiles: ['package.json', 'package-lock.json'],
-      verificationCommands: ['npm run typecheck', 'npm test', 'npm run build'],
-      rationale: `Upgrade to a version that fixes ${finding.vulnerability?.id ?? finding.id}.`,
-    }];
+    return [
+      {
+        package: dependency.name,
+        currentVersion: dependency.version,
+        recommendedVersion,
+        breakingChangeRisk: 'low' as const,
+        affectedFiles: ['package.json', 'package-lock.json'],
+        verificationCommands: ['npm run typecheck', 'npm test', 'npm run build'],
+        rationale: `Upgrade to a version that fixes ${finding.vulnerability?.id ?? finding.id}.`,
+      },
+    ];
   });
 }
 

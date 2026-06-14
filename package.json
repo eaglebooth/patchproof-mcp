@@ -16,12 +16,18 @@
     "node": ">=20.0.0 <21.0.0",
     "npm": ">=10.0.0"
   },
-  "os": ["linux", "darwin"],
-  "cpu": ["x64", "arm64"],
+  "os": [
+    "linux",
+    "darwin"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ],
   "scripts": {
     "clean": "rimraf dist coverage .cache",
-    "format": "prettier --write \"src/**/*.{ts,js,json,md}\" \"tests/**/*.{ts,js,json,md}\" \"web/**/*.{ts,js,html,css,json,md}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,js,json,md}\" \"tests/**/*.{ts,js,json,md}\" \"web/**/*.{ts,js,html,css,json,md}\"",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"api/**/*.ts\" \"scripts/**/*.mjs\" \"public/**/*.html\" \"*.{json,md}\" \"docs/**/*.md\" \"examples/agent-workflows/**/*.{json,md}\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"api/**/*.ts\" \"scripts/**/*.mjs\" \"public/**/*.html\" \"*.{json,md}\" \"docs/**/*.md\" \"examples/agent-workflows/**/*.{json,md}\"",
     "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\"",
     "lint:fix": "eslint --fix \"src/**/*.ts\" \"tests/**/*.ts\"",
     "typecheck": "tsc --noEmit",

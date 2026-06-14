@@ -53,7 +53,7 @@ chore(deps): bump @modelcontextprotocol/sdk to 1.0.4
       `docs/limitations.md`)
 - [ ] `npm run audit:secrets` is clean
 - [ ] `docs/acceptance-evidence.md` row added or updated
-- [ ] README.md, docs/*.md updated if user-facing behavior changed
+- [ ] README.md, docs/\*.md updated if user-facing behavior changed
 - [ ] One AC per PR; PR title references the AC
 
 ## Reporting security issues

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { loadConfig } from '../../src/config.js';
 
-describe('loadConfig (scaffold)', () => {
+describe('loadConfig', () => {
   it('returns sensible defaults when env is empty', () => {
     const c = loadConfig({}, []);
     expect(c.transport).toBe('stdio');
@@ -21,9 +21,8 @@ describe('loadConfig (scaffold)', () => {
     expect(c.transport).toBe('http');
   });
 
-  it('parses PATCHPROOF_OSV_MODE=live from env', () => {
-    const c = loadConfig({ PATCHPROOF_OSV_MODE: 'live' }, []);
-    expect(c.osvMode).toBe('live');
+  it('rejects the unimplemented live OSV mode', () => {
+    expect(() => loadConfig({ PATCHPROOF_OSV_MODE: 'live' }, [])).toThrow();
   });
 
   it('rejects an invalid transport', () => {

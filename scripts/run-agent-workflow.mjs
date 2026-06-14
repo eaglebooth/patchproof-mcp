@@ -37,11 +37,18 @@ for (const step of workflow.steps) {
   });
   if (!response.ok) throw new Error(`${step.tool} failed with HTTP ${response.status}`);
   const payload = await response.json();
-  process.stdout.write(`${JSON.stringify({ step: step.id, tool: step.tool, response: payload })}\n`);
+  process.stdout.write(
+    `${JSON.stringify({ step: step.id, tool: step.tool, response: payload })}\n`,
+  );
 }
 
 function validateWorkflow(value) {
-  if (!value || typeof value !== 'object' || !Array.isArray(value.steps) || value.steps.length === 0) {
+  if (
+    !value ||
+    typeof value !== 'object' ||
+    !Array.isArray(value.steps) ||
+    value.steps.length === 0
+  ) {
     throw new Error('Workflow must contain at least one step');
   }
   for (const step of value.steps) {

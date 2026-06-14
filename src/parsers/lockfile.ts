@@ -25,6 +25,13 @@ export interface ParsedLockfileEntry {
   readonly integrity?: string;
 }
 
+export type LockfileParseStatus = 'ok' | 'malformed';
+
+export interface ParsedLockfile {
+  readonly status: LockfileParseStatus;
+  readonly entries: ReadonlyArray<ParsedLockfileEntry>;
+}
+
 interface RawLockfilePackage {
   readonly name?: string;
   readonly version?: string;
@@ -49,13 +56,17 @@ const TRANSITIVE_PREFIX = 'node_modules/';
  * the project itself, not a third-party dependency.
  */
 export function parseNpmLockfile(jsonText: string): ReadonlyArray<ParsedLockfileEntry> {
+  return parseNpmLockfileDetailed(jsonText).entries;
+}
+
+export function parseNpmLockfileDetailed(jsonText: string): ParsedLockfile {
   let raw: unknown;
   try {
     raw = JSON.parse(jsonText);
   } catch {
-    return [];
+    return { status: 'malformed', entries: [] };
   }
-  if (!isRawLockfile(raw)) return [];
+  if (!isRawLockfile(raw)) return { status: 'malformed', entries: [] };
   const packages = raw.packages ?? {};
   const out: ParsedLockfileEntry[] = [];
   for (const key of Object.keys(packages)) {
@@ -85,7 +96,7 @@ export function parseNpmLockfile(jsonText: string): ReadonlyArray<ParsedLockfile
     if (a.version > b.version) return 1;
     return 0;
   });
-  return out;
+  return { status: 'ok', entries: out };
 }
 
 function isRawLockfile(value: unknown): value is RawLockfile {

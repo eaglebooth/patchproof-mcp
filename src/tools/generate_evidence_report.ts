@@ -8,7 +8,6 @@ import type { ToolContext, ToolDefinition } from './types.js';
 export const generateEvidenceReportInputSchema = z.object({
   repoRoot: z.string().min(1).optional(),
   format: z.enum(['json', 'html', 'both']).default('both'),
-  includeHtmlPreview: z.boolean().default(false),
 });
 
 export type GenerateEvidenceReportInput = z.infer<typeof generateEvidenceReportInputSchema>;
@@ -31,7 +30,6 @@ export const generateEvidenceReportTool: ToolDefinition = {
     return generateReport(ctx, {
       repoRoot: parsed.repoRoot,
       format: parsed.format,
-      includeHtmlPreview: parsed.includeHtmlPreview,
     });
   },
 };

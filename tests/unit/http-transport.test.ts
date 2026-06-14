@@ -25,7 +25,7 @@ describe('Streamable HTTP transport', () => {
       },
       body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list' }),
     });
-    const payload = await response.json() as {
+    const payload = (await response.json()) as {
       result?: { tools?: ReadonlyArray<{ name: string }> };
     };
 
@@ -50,7 +50,7 @@ describe('Streamable HTTP transport', () => {
         params: { name: 'generate_evidence_report', arguments: {} },
       }),
     });
-    const callPayload = await callResponse.json() as {
+    const callPayload = (await callResponse.json()) as {
       result?: { content?: ReadonlyArray<{ text?: string }> };
     };
     const reportText = callPayload.result?.content?.[0]?.text ?? '';
@@ -81,7 +81,7 @@ describe('Streamable HTTP transport', () => {
       headers: { 'Content-Type': 'application/json' },
       body: '{broken',
     });
-    const body = await response.json() as { error?: { code?: number } };
+    const body = (await response.json()) as { error?: { code?: number } };
 
     expect(response.status).toBe(500);
     expect(body.error?.code).toBe(-32603);

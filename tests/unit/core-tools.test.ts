@@ -13,16 +13,20 @@ import type { ToolContext } from '../../src/tools/types.js';
 interface ScanResult {
   filesScanned: number;
   bytesRead: number;
+  truncated: boolean;
+  truncationReason?: string;
   findings: ReadonlyArray<unknown>;
 }
 
 interface SbomResult {
   schemaVersion: string;
+  lockfileStatus: string;
   components: ReadonlyArray<{ name: string; version: string; purl: string }>;
 }
 
 interface AuditResult {
   osvMode: string;
+  lockfileStatus: string;
   dependencies: ReadonlyArray<{ name: string; version: string }>;
   vulnerabilities: ReadonlyArray<{ id: string; fixedVersions: ReadonlyArray<string> }>;
 }
@@ -80,6 +84,8 @@ describe('core MCP tools', () => {
 
     expect(result.filesScanned).toBe(3);
     expect(result.bytesRead).toBeGreaterThan(0);
+    expect(result.truncated).toBe(false);
+    expect(result.truncationReason).toBeUndefined();
     expect(result.findings).toEqual([]);
   });
 
@@ -88,6 +94,7 @@ describe('core MCP tools', () => {
     const second = (await generateSbomTool.run(ctx, {})) as SbomResult;
 
     expect(first.schemaVersion).toBe('1.5');
+    expect(first.lockfileStatus).toBe('ok');
     expect(first.components).toContainEqual({
       name: 'lodash',
       version: '4.17.20',
@@ -102,6 +109,7 @@ describe('core MCP tools', () => {
     const result = (await auditDependenciesTool.run(ctx, { osvMode: 'mock' })) as AuditResult;
 
     expect(result.osvMode).toBe('mock');
+    expect(result.lockfileStatus).toBe('ok');
     expect(result.dependencies).toEqual(
       expect.arrayContaining([expect.objectContaining({ name: 'lodash', version: '4.17.20' })]),
     );
@@ -111,6 +119,25 @@ describe('core MCP tools', () => {
         fixedVersions: ['4.17.21'],
       }),
     );
+  });
+
+  it('reports truncation instead of presenting a partial scan as complete', async () => {
+    const result = (await scanRepositoryTool.run(ctx, { maxFiles: 1 })) as ScanResult;
+
+    expect(result.filesScanned).toBe(1);
+    expect(result.truncated).toBe(true);
+    expect(result.truncationReason).toContain('file count exceeded');
+  });
+
+  it('rejects repository overrides outside the authorized root', async () => {
+    const sibling = await fs.mkdtemp(path.join(os.tmpdir(), 'patchproof-outside-'));
+    try {
+      await expect(scanRepositoryTool.run(ctx, { repoRoot: sibling })).rejects.toThrow(
+        'candidate escapes root',
+      );
+    } finally {
+      await fs.rm(sibling, { recursive: true, force: true });
+    }
   });
 
   it('generate_evidence_report returns JSON and self-contained HTML', async () => {
