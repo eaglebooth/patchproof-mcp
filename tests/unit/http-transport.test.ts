@@ -59,4 +59,31 @@ describe('Streamable HTTP transport', () => {
     expect(reportText).toContain('PatchProof');
     expect(reportText).toContain('"findings"');
   });
+
+  it('returns explicit HTTP errors for unsupported routes and methods', async () => {
+    running = await startHttp({ host: '127.0.0.1', port: 0 });
+    const origin = new URL(running.url).origin;
+
+    const missing = await fetch(`${origin}/missing`);
+    const method = await fetch(running.url);
+    const removed = await fetch(running.url, { method: 'DELETE' });
+
+    expect(missing.status).toBe(404);
+    expect(method.status).toBe(405);
+    expect(method.headers.get('allow')).toBe('POST, DELETE');
+    expect(removed.status).toBe(200);
+  });
+
+  it('returns JSON-RPC error output for malformed JSON', async () => {
+    running = await startHttp({ host: '127.0.0.1', port: 0 });
+    const response = await fetch(running.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{broken',
+    });
+    const body = await response.json() as { error?: { code?: number } };
+
+    expect(response.status).toBe(500);
+    expect(body.error?.code).toBe(-32603);
+  });
 });

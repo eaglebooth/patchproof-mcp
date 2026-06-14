@@ -18,10 +18,12 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      - run: npm run coverage
       - run: npm run build
       - run: npm run workflow:validate
       - run: npm run demo:evidence
       - name: Verify generated evidence is reproducible
-        run: git diff --exit-code -- examples/demo-report.json examples/demo-report.html
+        run: git diff --exit-code -- examples

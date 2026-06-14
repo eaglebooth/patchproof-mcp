@@ -64,6 +64,19 @@
       button:hover { background: #18534e; }
       .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0; }
       #status { min-height: 1.5rem; color: var(--accent); }
+      .risk {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin: 16px 0;
+      }
+      .risk div {
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: #0b1220;
+        padding: 12px;
+      }
+      .risk strong { display: block; color: var(--accent); font-size: 1.4rem; }
     </style>
   </head>
   <body>
@@ -82,7 +95,20 @@
         <div class="card"><strong>scan_repository</strong>Bounded repository statistics.</div>
         <div class="card"><strong>generate_sbom</strong>Deterministic CycloneDX-shaped SBOM.</div>
         <div class="card"><strong>audit_dependencies</strong>Offline vulnerability fixture audit.</div>
-        <div class="card"><strong>generate_evidence_report</strong>JSON and self-contained HTML evidence.</div>
+        <div class="card"><strong>generate_evidence_report</strong>Ranked risk and self-contained evidence.</div>
+      </div>
+
+      <h2>Transparent risk model</h2>
+      <p>
+        Findings are ranked from 0–100 using visible factors: severity or CVSS,
+        production versus development scope, direct versus transitive depth,
+        and fix availability. No hidden model or network lookup affects ranking.
+      </p>
+      <div class="risk">
+        <div><strong>0–34</strong>Low</div>
+        <div><strong>35–64</strong>Medium</div>
+        <div><strong>65–84</strong>High</div>
+        <div><strong>85–100</strong>Critical</div>
       </div>
 
       <h2>Verify the deployment</h2>

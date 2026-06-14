@@ -6,6 +6,19 @@
 export type Severity = 'critical' | 'high' | 'medium' | 'low' | 'unknown';
 export type Reachability = 'confirmed' | 'possible' | 'unknown';
 export type Risk = 'low' | 'medium' | 'high';
+export type RiskBand = 'critical' | 'high' | 'medium' | 'low';
+
+export interface RiskAssessment {
+  readonly score: number;
+  readonly band: RiskBand;
+  readonly factors: {
+    readonly severity: number;
+    readonly dependencyScope: number;
+    readonly dependencyDepth: number;
+    readonly fixAvailability: number;
+  };
+  readonly explanation: string;
+}
 
 export interface Dependency {
   readonly name: string;
@@ -35,6 +48,7 @@ export interface Finding {
   readonly secret?: SecretHit;
   readonly message: string;
   readonly severity: Severity;
+  readonly risk?: RiskAssessment;
 }
 
 export interface SecretHit {
@@ -87,6 +101,11 @@ export interface EvidenceReport {
     readonly config: Readonly<Record<string, unknown>>;
   };
   readonly findings: ReadonlyArray<Finding>;
+  readonly riskSummary: {
+    readonly highestScore: number;
+    readonly averageScore: number;
+    readonly counts: Readonly<Record<RiskBand, number>>;
+  };
   readonly reachability: ReadonlyArray<ReachabilityResult>;
   readonly remediation: ReadonlyArray<Remediation>;
   readonly verification: ReadonlyArray<VerificationResult>;

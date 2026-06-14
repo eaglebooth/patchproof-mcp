@@ -28,10 +28,12 @@ src/parsers      npm lockfile parsing
 src/sbom         deterministic CycloneDX-shaped output
 src/osv          offline vulnerability matching
 src/reporting    JSON and self-contained HTML evidence
+src/risk         transparent deterministic risk scoring
 src/security     typed errors, path checks, limits, redaction
 src/transport    stdio and Streamable HTTP
 tests/unit       unit and HTTP integration tests
 examples         reproducible reports and agent workflows
+fixtures/scenarios five success and failure cases
 ```
 
 ## Agent Workflow
@@ -49,6 +51,7 @@ examples         reproducible reports and agent workflows
    npm run lint
    npm run typecheck
    npm test
+   npm run coverage
    npm run build
    npm run workflow:validate
    ```

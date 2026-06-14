@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-06-13T00:00:00.000Z",
+  "inputs": {
+    "repoRoot": "fixtures/scenarios/malformed",
+    "config": {
+      "ecosystem": "npm",
+      "auditMode": "mock",
+      "sbomSchemaVersion": "1.5",
+      "sbomSerialNumber": "urn:uuid:31533537-49a2-41bf-87dc-114f7a6c9348",
+      "componentCount": 0,
+      "dependencyCount": 0,
+      "vulnerabilityCount": 0
+    }
+  },
+  "findings": [],
+  "riskSummary": {
+    "highestScore": 0,
+    "averageScore": 0,
+    "counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    }
+  },
+  "reachability": [],
+  "remediation": [],
+  "verification": [],
+  "limitations": [
+    "Vulnerability matching uses a deterministic local fixture table and does not query the live OSV service.",
+    "Reachability analysis and verification command execution are not implemented in this four-tool MVP.",
+    "No readable package-lock.json was found, so the SBOM and dependency audit are empty."
+  ],
+  "redactions": []
+}

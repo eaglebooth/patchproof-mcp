@@ -32,7 +32,8 @@ interface ReportResult {
   report: {
     schemaVersion: string;
     inputs: { config: Record<string, unknown> };
-    findings: ReadonlyArray<{ id: string }>;
+    findings: ReadonlyArray<{ id: string; risk?: { score: number; band: string } }>;
+    riskSummary: { highestScore: number; averageScore: number };
     remediation: ReadonlyArray<{ package: string; recommendedVersion: string }>;
     limitations: ReadonlyArray<string>;
   };
@@ -119,9 +120,13 @@ describe('core MCP tools', () => {
     expect(result.report.schemaVersion).toBeTruthy();
     expect(result.report.inputs.config['componentCount']).toBe(1);
     expect(result.report.inputs.config['vulnerabilityCount']).toBe(1);
-    expect(result.report.findings).toContainEqual(
-      expect.objectContaining({ id: 'lodash@4.17.20:GHSA-xxxx-yyyy-zzzz' }),
+    const finding = result.report.findings.find(
+      (candidate) => candidate.id === 'lodash@4.17.20:GHSA-xxxx-yyyy-zzzz',
     );
+    expect(finding?.risk?.score).toBe(61);
+    expect(finding?.risk?.band).toBe('medium');
+    expect(result.report.riskSummary.highestScore).toBe(61);
+    expect(result.report.riskSummary.averageScore).toBe(61);
     expect(result.report.remediation).toContainEqual(
       expect.objectContaining({ package: 'lodash', recommendedVersion: '4.17.21' }),
     );
@@ -130,6 +135,7 @@ describe('core MCP tools', () => {
     expect(result.html).toContain('PatchProof Evidence Report');
     expect(result.html).toContain('SBOM components');
     expect(result.html).toContain('GHSA-xxxx-yyyy-zzzz');
+    expect(result.html).toContain('highest risk');
     expect(result.html).not.toMatch(/<script[^>]+src=/u);
     expect(result.html).not.toMatch(/<link[^>]+href=/u);
   });

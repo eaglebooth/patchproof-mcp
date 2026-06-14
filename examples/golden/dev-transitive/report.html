@@ -18,59 +18,26 @@
 <p class="meta">schemaVersion: 1.0.0 &middot; generatedAt: 2026-06-13T00:00:00.000Z</p>
 <section class="summary" aria-label="Audit summary">
   <div class="metric"><strong>2</strong>SBOM components</div>
-  <div class="metric"><strong>2</strong>vulnerabilities</div>
-  <div class="metric"><strong>61</strong>highest risk</div>
-  <div class="metric"><strong>2</strong>remediations</div>
+  <div class="metric"><strong>1</strong>vulnerabilities</div>
+  <div class="metric"><strong>23</strong>highest risk</div>
+  <div class="metric"><strong>1</strong>remediations</div>
 </section>
 <pre>{
   &quot;schemaVersion&quot;: &quot;1.0.0&quot;,
   &quot;generatedAt&quot;: &quot;2026-06-13T00:00:00.000Z&quot;,
   &quot;inputs&quot;: {
-    &quot;repoRoot&quot;: &quot;fixtures/demo-repository&quot;,
+    &quot;repoRoot&quot;: &quot;fixtures/scenarios/dev-transitive&quot;,
     &quot;config&quot;: {
       &quot;ecosystem&quot;: &quot;npm&quot;,
       &quot;auditMode&quot;: &quot;mock&quot;,
       &quot;sbomSchemaVersion&quot;: &quot;1.5&quot;,
-      &quot;sbomSerialNumber&quot;: &quot;urn:uuid:5495ce3a-61df-41af-8975-ff0e42b4cb4e&quot;,
+      &quot;sbomSerialNumber&quot;: &quot;urn:uuid:dc476e26-608a-4781-8b56-46dc580575e7&quot;,
       &quot;componentCount&quot;: 2,
       &quot;dependencyCount&quot;: 2,
-      &quot;vulnerabilityCount&quot;: 2
+      &quot;vulnerabilityCount&quot;: 1
     }
   },
   &quot;findings&quot;: [
-    {
-      &quot;id&quot;: &quot;lodash@4.17.20:GHSA-xxxx-yyyy-zzzz&quot;,
-      &quot;kind&quot;: &quot;vulnerability&quot;,
-      &quot;dependency&quot;: {
-        &quot;name&quot;: &quot;lodash&quot;,
-        &quot;version&quot;: &quot;4.17.20&quot;
-      },
-      &quot;vulnerability&quot;: {
-        &quot;id&quot;: &quot;GHSA-xxxx-yyyy-zzzz&quot;,
-        &quot;aliases&quot;: [
-          &quot;CVE-2021-23337&quot;
-        ],
-        &quot;summary&quot;: &quot;Command injection via template&quot;,
-        &quot;severity&quot;: &quot;high&quot;,
-        &quot;cvssScore&quot;: 7.2,
-        &quot;fixedVersions&quot;: [
-          &quot;4.17.21&quot;
-        ]
-      },
-      &quot;message&quot;: &quot;lodash@4.17.20: Command injection via template&quot;,
-      &quot;severity&quot;: &quot;high&quot;,
-      &quot;risk&quot;: {
-        &quot;score&quot;: 61,
-        &quot;band&quot;: &quot;medium&quot;,
-        &quot;factors&quot;: {
-          &quot;severity&quot;: 72,
-          &quot;dependencyScope&quot;: 1,
-          &quot;dependencyDepth&quot;: 1,
-          &quot;fixAvailability&quot;: 0.85
-        },
-        &quot;explanation&quot;: &quot;high severity (72/100 base); production dependency (x1.00); direct dependency (x1.00); fix available (x0.85)&quot;
-      }
-    },
     {
       &quot;id&quot;: &quot;minimatch@3.0.4:GHSA-aaaa-bbbb-cccc&quot;,
       &quot;kind&quot;: &quot;vulnerability&quot;,
@@ -93,46 +60,30 @@
       &quot;message&quot;: &quot;minimatch@3.0.4: ReDoS in minimatch&quot;,
       &quot;severity&quot;: &quot;medium&quot;,
       &quot;risk&quot;: {
-        &quot;score&quot;: 45,
-        &quot;band&quot;: &quot;medium&quot;,
+        &quot;score&quot;: 23,
+        &quot;band&quot;: &quot;low&quot;,
         &quot;factors&quot;: {
           &quot;severity&quot;: 53,
-          &quot;dependencyScope&quot;: 1,
-          &quot;dependencyDepth&quot;: 1,
+          &quot;dependencyScope&quot;: 0.65,
+          &quot;dependencyDepth&quot;: 0.8,
           &quot;fixAvailability&quot;: 0.85
         },
-        &quot;explanation&quot;: &quot;medium severity (53/100 base); production dependency (x1.00); direct dependency (x1.00); fix available (x0.85)&quot;
+        &quot;explanation&quot;: &quot;medium severity (53/100 base); development dependency (x0.65); transitive dependency (x0.80); fix available (x0.85)&quot;
       }
     }
   ],
   &quot;riskSummary&quot;: {
-    &quot;highestScore&quot;: 61,
-    &quot;averageScore&quot;: 53,
+    &quot;highestScore&quot;: 23,
+    &quot;averageScore&quot;: 23,
     &quot;counts&quot;: {
       &quot;critical&quot;: 0,
       &quot;high&quot;: 0,
-      &quot;medium&quot;: 2,
-      &quot;low&quot;: 0
+      &quot;medium&quot;: 0,
+      &quot;low&quot;: 1
     }
   },
   &quot;reachability&quot;: [],
   &quot;remediation&quot;: [
-    {
-      &quot;package&quot;: &quot;lodash&quot;,
-      &quot;currentVersion&quot;: &quot;4.17.20&quot;,
-      &quot;recommendedVersion&quot;: &quot;4.17.21&quot;,
-      &quot;breakingChangeRisk&quot;: &quot;low&quot;,
-      &quot;affectedFiles&quot;: [
-        &quot;package.json&quot;,
-        &quot;package-lock.json&quot;
-      ],
-      &quot;verificationCommands&quot;: [
-        &quot;npm run typecheck&quot;,
-        &quot;npm test&quot;,
-        &quot;npm run build&quot;
-      ],
-      &quot;rationale&quot;: &quot;Upgrade to a version that fixes GHSA-xxxx-yyyy-zzzz.&quot;
-    },
     {
       &quot;package&quot;: &quot;minimatch&quot;,
       &quot;currentVersion&quot;: &quot;3.0.4&quot;,

@@ -60,10 +60,10 @@ async function handleRequest(
     return;
   }
 
-  const body = req.method === 'POST' ? await readJsonBody(req) : undefined;
   const transport = new StreamableHTTPServerTransport({ enableJsonResponse: true });
   const server = buildServer({ logger });
   try {
+    const body = req.method === 'POST' ? await readJsonBody(req) : undefined;
     await server.connect(transport as unknown as Transport);
     await transport.handleRequest(req, res, body);
   } catch (error: unknown) {

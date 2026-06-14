@@ -16,13 +16,14 @@ The complete public tool set is implemented and covered by focused tests:
 - `audit_dependencies`: dependency extraction with a deterministic mock
   vulnerability table.
 - `generate_evidence_report`: an end-to-end JSON/HTML artifact combining SBOM
-  components, matched vulnerabilities, and upgrade recommendations.
+  components, matched vulnerabilities, transparent risk scores, and upgrade
+  recommendations.
 
 Important limitations:
 
 - Only npm `package-lock.json` repositories are supported.
-- `audit_dependencies` does not yet query the live OSV API. Selecting `live`
-  currently uses the same deterministic mock data.
+- `audit_dependencies` does not query the live OSV API; the public schema
+  intentionally exposes deterministic `mock` mode only.
 - `scan_repository` intentionally returns bounded repository statistics;
   vulnerability matching is handled by `audit_dependencies`.
 - Reachability classification and verification command execution are not yet
@@ -41,6 +42,8 @@ tools without installing an MCP client.
 Committed, reproducible report artifacts are available at
 `examples/demo-report.json` and `examples/demo-report.html`. GitHub Actions
 rebuilds them and fails if the committed evidence becomes stale.
+Five additional golden scenarios under `examples/golden/` cover safe,
+vulnerable, dev/transitive, malformed-lockfile, and missing-lockfile behavior.
 
 ## Agent Workflows
 
@@ -76,13 +79,17 @@ documented in `docs/cyops-provenance.md`.
 
 ```bash
 npm ci
+npm run lint
 npm run typecheck
 npm test
+npm run coverage
 npm run build
 ```
 
-The focused core-tool test suite creates a temporary npm repository and calls
-the four implemented tools directly.
+The suite contains 64 tests across core tools, transports, security utilities,
+risk scoring, and five scenario fixtures. CI enforces at least 85% line,
+statement, and function coverage and 80% branch coverage. The current verified
+run reports 92.59% lines/statements, 96.25% functions, and 81.41% branches.
 
 ## Run
 
@@ -169,8 +176,25 @@ Input:
 ```
 
 Runs the implemented SBOM and deterministic dependency audit together. It
-returns findings and upgrade recommendations as JSON and, for `html` or
-`both`, a self-contained HTML report with summary metrics.
+returns ranked findings, factor-by-factor risk scores, and upgrade
+recommendations as JSON and, for `html` or `both`, a self-contained HTML report
+with summary metrics.
+
+## Risk Model
+
+PatchProof ranks each vulnerability with a deterministic `0–100` score:
+
+```text
+severity-or-CVSS
+× production/dev factor
+× direct/transitive factor
+× fix-availability factor
+```
+
+The report preserves every factor and a human-readable explanation. The model
+does not use hidden weights or network data, so identical lockfiles always
+produce identical ranking. See `src/risk/scorer.ts`,
+`tests/unit/risk-scorer.test.ts`, and `docs/acceptance-evidence.md`.
 
 ## Architecture
 
@@ -182,9 +206,11 @@ src/parsers      npm lockfile parsing
 src/sbom         deterministic SBOM assembly
 src/osv          deterministic mock dependency audit
 src/reporting    end-to-end JSON and HTML evidence assembly
+src/risk         transparent deterministic risk scoring
 src/security     path, resource, error, and redaction utilities
 src/transport    verified stdio and Streamable HTTP transports
 tests/unit       infrastructure and focused core-tool tests
+fixtures/scenarios safe, vulnerable, dev/transitive, malformed, and missing cases
 ```
 
 Business logic is kept outside the MCP registry so it can be tested directly.

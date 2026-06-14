@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PatchProof Evidence Report</title>
+<style>
+  body { font-family: ui-sans-serif, system-ui, sans-serif; margin: 0; padding: 1.5rem; background: #fafafa; color: #111; }
+  h1 { font-size: 1.25rem; margin: 0 0 0.5rem 0; }
+  p.meta { color: #555; font-size: 0.875rem; margin: 0 0 1rem 0; }
+  .summary { display: flex; gap: 1rem; margin: 1rem 0; }
+  .metric { background: #fff; border: 1px solid #ddd; padding: 0.75rem 1rem; min-width: 9rem; }
+  .metric strong { display: block; font-size: 1.5rem; }
+  pre { background: #fff; border: 1px solid #ddd; padding: 1rem; overflow: auto; font-size: 0.8125rem; }
+</style>
+</head>
+<body>
+<h1>PatchProof Evidence Report</h1>
+<p class="meta">schemaVersion: 1.0.0 &middot; generatedAt: 2026-06-13T00:00:00.000Z</p>
+<section class="summary" aria-label="Audit summary">
+  <div class="metric"><strong>0</strong>SBOM components</div>
+  <div class="metric"><strong>0</strong>vulnerabilities</div>
+  <div class="metric"><strong>0</strong>highest risk</div>
+  <div class="metric"><strong>0</strong>remediations</div>
+</section>
+<pre>{
+  &quot;schemaVersion&quot;: &quot;1.0.0&quot;,
+  &quot;generatedAt&quot;: &quot;2026-06-13T00:00:00.000Z&quot;,
+  &quot;inputs&quot;: {
+    &quot;repoRoot&quot;: &quot;fixtures/scenarios/malformed&quot;,
+    &quot;config&quot;: {
+      &quot;ecosystem&quot;: &quot;npm&quot;,
+      &quot;auditMode&quot;: &quot;mock&quot;,
+      &quot;sbomSchemaVersion&quot;: &quot;1.5&quot;,
+      &quot;sbomSerialNumber&quot;: &quot;urn:uuid:31533537-49a2-41bf-87dc-114f7a6c9348&quot;,
+      &quot;componentCount&quot;: 0,
+      &quot;dependencyCount&quot;: 0,
+      &quot;vulnerabilityCount&quot;: 0
+    }
+  },
+  &quot;findings&quot;: [],
+  &quot;riskSummary&quot;: {
+    &quot;highestScore&quot;: 0,
+    &quot;averageScore&quot;: 0,
+    &quot;counts&quot;: {
+      &quot;critical&quot;: 0,
+      &quot;high&quot;: 0,
+      &quot;medium&quot;: 0,
+      &quot;low&quot;: 0
+    }
+  },
+  &quot;reachability&quot;: [],
+  &quot;remediation&quot;: [],
+  &quot;verification&quot;: [],
+  &quot;limitations&quot;: [
+    &quot;Vulnerability matching uses a deterministic local fixture table and does not query the live OSV service.&quot;,
+    &quot;Reachability analysis and verification command execution are not implemented in this four-tool MVP.&quot;,
+    &quot;No readable package-lock.json was found, so the SBOM and dependency audit are empty.&quot;
+  ],
+  &quot;redactions&quot;: []
+}</pre>
+</body>
+</html>

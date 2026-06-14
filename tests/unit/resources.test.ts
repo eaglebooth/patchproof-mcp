@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { ResourceGovernor } from '../../src/security/resources.js';
 import { ResourceLimitError } from '../../src/security/errors.js';
 
-describe('ResourceGovernor (scaffold)', () => {
+describe('ResourceGovernor', () => {
   it('enforces a file-count cap', () => {
     const g = new ResourceGovernor(
       { maxFiles: 2, maxBytes: 1024, maxDepth: 1, wallClockMs: 1_000 },
@@ -40,5 +40,27 @@ describe('ResourceGovernor (scaffold)', () => {
     );
     now = 200;
     expect(() => g.checkTime()).toThrow(ResourceLimitError);
+  });
+
+  it('ignores negative byte deltas and exposes snapshots', () => {
+    const g = new ResourceGovernor(
+      { maxFiles: 10, maxBytes: 10, maxDepth: 2, wallClockMs: 1_000 },
+      () => 42,
+    );
+    g.checkFile();
+    g.checkBytes(-1);
+    g.checkBytes(4);
+    expect(g.snapshot()).toEqual({ files: 1, bytes: 4, depth: 0, startedAt: 42 });
+  });
+
+  it('resets accumulated file and byte counts', () => {
+    const g = new ResourceGovernor(
+      { maxFiles: 10, maxBytes: 10, maxDepth: 2, wallClockMs: 1_000 },
+      () => 0,
+    );
+    g.checkFile();
+    g.checkBytes(4);
+    g.reset();
+    expect(g.snapshot()).toEqual({ files: 0, bytes: 0, depth: 0, startedAt: 0 });
   });
 });

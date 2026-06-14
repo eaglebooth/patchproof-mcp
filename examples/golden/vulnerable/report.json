@@ -2,12 +2,12 @@
   "schemaVersion": "1.0.0",
   "generatedAt": "2026-06-13T00:00:00.000Z",
   "inputs": {
-    "repoRoot": "fixtures/demo-repository",
+    "repoRoot": "fixtures/scenarios/vulnerable",
     "config": {
       "ecosystem": "npm",
       "auditMode": "mock",
       "sbomSchemaVersion": "1.5",
-      "sbomSerialNumber": "urn:uuid:5495ce3a-61df-41af-8975-ff0e42b4cb4e",
+      "sbomSerialNumber": "urn:uuid:27604c9d-cbef-47f2-86d2-a8496ab6315f",
       "componentCount": 2,
       "dependencyCount": 2,
       "vulnerabilityCount": 2

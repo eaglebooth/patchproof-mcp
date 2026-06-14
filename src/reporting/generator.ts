@@ -7,6 +7,7 @@
 import { resolveRepoRoot, type RunRepositoryScanInput } from '../scanners/files.js';
 import { buildCycloneDxSbom } from '../sbom/cyclonedx.js';
 import { auditDependencies, MOCK_VULNS } from '../osv/audit.js';
+import { scoreDependencyRisk, summarizeRisk } from '../risk/scorer.js';
 import { SCHEMA_VERSION } from '../schemas/index.js';
 import { systemClock } from '../utils/clock.js';
 import type { EvidenceReport, Finding, Remediation } from '../types/index.js';
@@ -59,6 +60,7 @@ export async function generateReport(
       },
     },
     findings,
+    riskSummary: summarizeRisk(findings.flatMap((finding) => finding.risk ? [finding.risk] : [])),
     reachability: [],
     remediation,
     verification: [],
@@ -97,10 +99,21 @@ function toFindings(
         },
         message: `${dependency.name}@${dependency.version}: ${vulnerability.summary}`,
         severity: vulnerability.severity,
+        risk: scoreDependencyRisk(dependency, {
+          id: vulnerability.id,
+          aliases: vulnerability.aliases ?? [],
+          summary: vulnerability.summary,
+          severity: vulnerability.severity,
+          ...(typeof vulnerability.cvssScore === 'number' ? { cvssScore: vulnerability.cvssScore } : {}),
+          fixedVersions: vulnerability.fixedVersions,
+        }),
       });
     }
   }
-  return findings;
+  return findings.sort((a, b) => {
+    const scoreDelta = (b.risk?.score ?? 0) - (a.risk?.score ?? 0);
+    return scoreDelta !== 0 ? scoreDelta : a.id.localeCompare(b.id);
+  });
 }
 
 function toRemediation(findings: ReadonlyArray<Finding>): Remediation[] {
@@ -146,6 +159,7 @@ export function renderHtml(report: EvidenceReport): string {
 <section class="summary" aria-label="Audit summary">
   <div class="metric"><strong>${componentCount}</strong>SBOM components</div>
   <div class="metric"><strong>${vulnerabilityCount}</strong>vulnerabilities</div>
+  <div class="metric"><strong>${report.riskSummary.highestScore}</strong>highest risk</div>
   <div class="metric"><strong>${report.remediation.length}</strong>remediations</div>
 </section>
 <pre>${escaped}</pre>

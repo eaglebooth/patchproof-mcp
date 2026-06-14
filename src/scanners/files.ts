@@ -68,10 +68,12 @@ export async function runRepositoryScan(
 
   const started = systemClock.now().getTime();
   const stats = await walk(root, 0, {
+    root,
     governor,
     includeHidden,
     followSymlinks,
     ignoreDirs: new Set<string>(SCAN_IGNORE_DIRS),
+    visitedDirectories: new Set<string>([root]),
   });
   const durationMs = systemClock.now().getTime() - started;
 
@@ -94,10 +96,12 @@ export function resolveRepoRoot(ctx: ToolContext, override: string | undefined):
 }
 
 interface WalkOptions {
+  readonly root: string;
   readonly governor: ResourceGovernor;
   readonly includeHidden: boolean;
   readonly followSymlinks: boolean;
   readonly ignoreDirs: Set<string>;
+  readonly visitedDirectories: Set<string>;
 }
 
 interface WalkStats {
@@ -150,10 +154,8 @@ async function walk(
     if (entry.isSymbolicLink() && opts.followSymlinks) {
       try {
         const real = nodeFs.realpathSync(childPath);
-        if (!real.startsWith(opts.governor.limits as unknown as string)) {
-          // No-op: keep typing tidy; the realpath is only used to
-          // avoid cycles in deeper recursions.
-        }
+        if (!isInsideRoot(opts.root, real) || opts.visitedDirectories.has(real)) continue;
+        opts.visitedDirectories.add(real);
         const sub = await walk(real, depth + 1, opts);
         stats.files += sub.files;
         stats.bytes += sub.bytes;
@@ -163,6 +165,11 @@ async function walk(
     }
   }
   return stats;
+}
+
+function isInsideRoot(root: string, candidate: string): boolean {
+  const relative = path.relative(root, candidate);
+  return relative === '' || (relative.length > 0 && !relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
 function shouldSkipEntry(entry: Dirent, opts: WalkOptions): boolean {

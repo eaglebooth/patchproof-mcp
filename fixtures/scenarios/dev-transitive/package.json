@@ -1,0 +1,7 @@
+{
+  "name": "dev-transitive-fixture",
+  "version": "1.0.0",
+  "devDependencies": {
+    "build-tool": "1.0.0"
+  }
+}

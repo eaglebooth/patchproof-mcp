@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-06-13T00:00:00.000Z",
+  "inputs": {
+    "repoRoot": "fixtures/scenarios/dev-transitive",
+    "config": {
+      "ecosystem": "npm",
+      "auditMode": "mock",
+      "sbomSchemaVersion": "1.5",
+      "sbomSerialNumber": "urn:uuid:dc476e26-608a-4781-8b56-46dc580575e7",
+      "componentCount": 2,
+      "dependencyCount": 2,
+      "vulnerabilityCount": 1
+    }
+  },
+  "findings": [
+    {
+      "id": "minimatch@3.0.4:GHSA-aaaa-bbbb-cccc",
+      "kind": "vulnerability",
+      "dependency": {
+        "name": "minimatch",
+        "version": "3.0.4"
+      },
+      "vulnerability": {
+        "id": "GHSA-aaaa-bbbb-cccc",
+        "aliases": [
+          "CVE-2022-3517"
+        ],
+        "summary": "ReDoS in minimatch",
+        "severity": "medium",
+        "cvssScore": 5.3,
+        "fixedVersions": [
+          "3.1.2"
+        ]
+      },
+      "message": "minimatch@3.0.4: ReDoS in minimatch",
+      "severity": "medium",
+      "risk": {
+        "score": 23,
+        "band": "low",
+        "factors": {
+          "severity": 53,
+          "dependencyScope": 0.65,
+          "dependencyDepth": 0.8,
+          "fixAvailability": 0.85
+        },
+        "explanation": "medium severity (53/100 base); development dependency (x0.65); transitive dependency (x0.80); fix available (x0.85)"
+      }
+    }
+  ],
+  "riskSummary": {
+    "highestScore": 23,
+    "averageScore": 23,
+    "counts": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 1
+    }
+  },
+  "reachability": [],
+  "remediation": [
+    {
+      "package": "minimatch",
+      "currentVersion": "3.0.4",
+      "recommendedVersion": "3.1.2",
+      "breakingChangeRisk": "low",
+      "affectedFiles": [
+        "package.json",
+        "package-lock.json"
+      ],
+      "verificationCommands": [
+        "npm run typecheck",
+        "npm test",
+        "npm run build"
+      ],
+      "rationale": "Upgrade to a version that fixes GHSA-aaaa-bbbb-cccc."
+    }
+  ],
+  "verification": [],
+  "limitations": [
+    "Vulnerability matching uses a deterministic local fixture table and does not query the live OSV service.",
+    "Reachability analysis and verification command execution are not implemented in this four-tool MVP."
+  ],
+  "redactions": []
+}
