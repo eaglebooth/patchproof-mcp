@@ -1,0 +1,9 @@
+{
+  "name": "Release gate",
+  "goal": "Produce reviewable evidence before an AI agent recommends a release.",
+  "steps": [
+    { "id": "bounded-scan", "tool": "scan_repository", "arguments": { "maxFiles": 50000, "maxBytes": 524288000 } },
+    { "id": "audit", "tool": "audit_dependencies", "arguments": { "osvMode": "mock" } },
+    { "id": "evidence", "tool": "generate_evidence_report", "arguments": { "format": "both" } }
+  ]
+}

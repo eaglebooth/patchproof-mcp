@@ -42,6 +42,31 @@ Committed, reproducible report artifacts are available at
 `examples/demo-report.json` and `examples/demo-report.html`. GitHub Actions
 rebuilds them and fails if the committed evidence becomes stale.
 
+## Agent Workflows
+
+Three machine-readable workflows demonstrate how AI coding agents compose the
+four MCP tools:
+
+- `security-triage`
+- `release-gate`
+- `evidence-review`
+
+Validate them offline:
+
+```bash
+npm run workflow:validate
+```
+
+Execute one against a running MCP endpoint:
+
+```bash
+npm run workflow:run -- release-gate http://127.0.0.1:8765/mcp
+```
+
+Client setup guides for Claude Code, Codex, and GitHub Copilot live in
+`examples/agent-workflows/`. CyOps session-to-repository provenance is
+documented in `docs/cyops-provenance.md`.
+
 ## Requirements
 
 - Node.js 20
@@ -188,6 +213,8 @@ evidence. Manual verification confirmed:
   the complete four-tool MCP surface through JSON-RPC;
 - GitHub Actions independently repeats those checks on Node.js 20 and verifies
   that the committed demo evidence is reproducible.
+- Three agent workflows are machine-validated and can be executed over MCP
+  JSON-RPC with `scripts/run-agent-workflow.mjs`.
 
 ## License
 

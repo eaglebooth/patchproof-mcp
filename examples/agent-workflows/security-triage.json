@@ -1,0 +1,9 @@
+{
+  "name": "Security triage",
+  "goal": "Give an AI coding agent a deterministic dependency-risk summary.",
+  "steps": [
+    { "id": "inventory", "tool": "scan_repository", "arguments": {} },
+    { "id": "dependencies", "tool": "generate_sbom", "arguments": {} },
+    { "id": "vulnerabilities", "tool": "audit_dependencies", "arguments": { "osvMode": "mock" } }
+  ]
+}

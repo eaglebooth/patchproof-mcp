@@ -1,0 +1,8 @@
+{
+  "name": "Evidence review",
+  "goal": "Let an AI reviewer compare dependency inventory, findings, and upgrades.",
+  "steps": [
+    { "id": "sbom", "tool": "generate_sbom", "arguments": { "format": "cyclonedx" } },
+    { "id": "report", "tool": "generate_evidence_report", "arguments": { "format": "json" } }
+  ]
+}

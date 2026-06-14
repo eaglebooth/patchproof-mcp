@@ -34,6 +34,8 @@
     "start:http": "node dist/server/index.js --transport=http",
     "demo": "node scripts/demo.js",
     "demo:evidence": "node scripts/generate-demo-evidence.mjs",
+    "workflow:run": "node scripts/run-agent-workflow.mjs",
+    "workflow:validate": "node scripts/validate-agent-workflows.mjs",
     "bench": "vitest bench --run",
     "audit:secrets": "bash scripts/audit-secrets.sh",
     "prepare": "node -e \"process.exit(0)\""
