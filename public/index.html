@@ -131,8 +131,8 @@
       <span class="badge">Built with CyOps Humanize + MiniMax M3</span>
       <h1>PatchProof MCP</h1>
       <p>
-        A focused four-tool MCP server for reproducible npm supply-chain inspection. The public deployment runs against
-        a safe bundled fixture.
+        A focused four-tool MCP server connecting npm lockfiles to live OSV findings, source import reachability,
+        remediation plans, and reproducible evidence. The public deployment runs against a safe bundled fixture.
       </p>
 
       <h2>Live MCP endpoint</h2>
@@ -141,14 +141,14 @@
       <div class="grid">
         <div class="card"><strong>scan_repository</strong>Bounded repository statistics.</div>
         <div class="card"><strong>generate_sbom</strong>Deterministic CycloneDX-shaped SBOM.</div>
-        <div class="card"><strong>audit_dependencies</strong>Offline vulnerability fixture audit.</div>
-        <div class="card"><strong>generate_evidence_report</strong>Ranked risk and self-contained evidence.</div>
+        <div class="card"><strong>audit_dependencies</strong>Live OSV with bounded fallback and cache.</div>
+        <div class="card"><strong>generate_evidence_report</strong>Reachability, remediation, and evidence.</div>
       </div>
 
       <h2>Transparent risk model</h2>
       <p>
-        Findings are ranked from 0–100 using visible factors: severity or CVSS, production versus development scope,
-        direct versus transitive depth, and fix availability. No hidden model or network lookup affects ranking.
+        Findings are ranked from 0–100 using visible factors: OSV CVSS or severity, production versus development scope,
+        direct versus transitive depth, and fix availability. Source imports add file-line reachability evidence.
       </p>
       <div class="risk">
         <div><strong>0–34</strong>Low</div>
@@ -163,8 +163,15 @@
         <button type="button" data-method="list">List MCP tools</button>
         <button type="button" data-tool="scan_repository">Run repository scan</button>
         <button type="button" data-tool="generate_sbom">Generate SBOM</button>
-        <button type="button" data-tool="audit_dependencies">Audit dependencies</button>
-        <button type="button" data-tool="generate_evidence_report">Generate evidence</button>
+        <button type="button" data-tool="audit_dependencies" data-arguments='{"osvMode":"mock"}'>
+          Deterministic audit
+        </button>
+        <button type="button" data-tool="audit_dependencies" data-arguments='{"osvMode":"live","fallbackToMock":true}'>
+          Live OSV audit
+        </button>
+        <button type="button" data-tool="generate_evidence_report" data-arguments='{"osvMode":"mock"}'>
+          Generate evidence
+        </button>
       </div>
       <p id="status" role="status"></p>
       <pre id="output">Select an action to inspect the live JSON-RPC response.</pre>
@@ -221,7 +228,10 @@ curl -X POST https://YOUR-DEPLOYMENT.vercel.app/api/mcp \
         button.addEventListener('click', () => {
           void callMcp({
             method: 'tools/call',
-            params: { name: button.dataset.tool, arguments: {} },
+            params: {
+              name: button.dataset.tool,
+              arguments: button.dataset.arguments ? JSON.parse(button.dataset.arguments) : {},
+            },
           });
         });
       }

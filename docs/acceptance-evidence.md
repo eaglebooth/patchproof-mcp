@@ -10,7 +10,11 @@ or command.
 | Repository overrides remain inside the authorized root    | `src/scanners/files.ts`, `src/security/paths.ts`                 | `tests/unit/core-tools.test.ts`, `tests/unit/paths.test.ts`              | `npm test`                                                          |
 | Partial scans are marked as truncated                     | `src/scanners/files.ts`                                          | `tests/unit/core-tools.test.ts`                                          | `npm test`                                                          |
 | SBOM output is deterministic                              | `src/sbom/cyclonedx.ts`                                          | `tests/unit/core-tools.test.ts`                                          | `examples/golden/*/report.json`                                     |
-| Dependency auditing is offline and deterministic          | `src/osv/audit.ts`                                               | `tests/unit/core-tools.test.ts`                                          | `examples/golden/vulnerable/report.json`                            |
+| Dependency auditing has deterministic offline evidence    | `src/osv/audit.ts`                                               | `tests/unit/core-tools.test.ts`                                          | `examples/golden/vulnerable/report.json`                            |
+| Live npm vulnerabilities use bounded official OSV queries | `src/osv/live.ts`, `src/osv/cvss.ts`                             | `tests/unit/osv-live.test.ts`                                            | `docs/live-osv-and-reachability.md`                                 |
+| Vulnerable imports produce file-line reachability         | `src/reachability/analyzer.ts`                                   | `tests/unit/reachability-remediation.test.ts`                            | `examples/demo-report.json`                                         |
+| Remediation reflects reachability and semver distance     | `src/remediation/planner.ts`                                     | `tests/unit/reachability-remediation.test.ts`                            | `examples/demo-report.json`                                         |
+| Verification rejects command injection and avoids shells  | `src/verification/runner.ts`                                     | `tests/unit/verification-runner.test.ts`                                 | `docs/live-osv-and-reachability.md`                                 |
 | Risk scoring is transparent and deterministic             | `src/risk/scorer.ts`                                             | `tests/unit/risk-scorer.test.ts`, `tests/unit/scenario-evidence.test.ts` | `examples/golden/dev-transitive/report.json`                        |
 | Evidence reports combine findings and remediation         | `src/reporting/generator.ts`                                     | `tests/unit/core-tools.test.ts`                                          | `examples/demo-report.{json,html}`                                  |
 | Missing and malformed lockfiles produce explicit findings | `src/parsers/lockfile.ts`, `src/reporting/generator.ts`          | `tests/unit/scenario-evidence.test.ts`                                   | `examples/golden/{malformed,missing}/`                              |
@@ -20,8 +24,8 @@ or command.
 
 ## Verified Quality Gate
 
-The current local verification run contains 67 passing tests. Exact coverage
-values are emitted by `npm run coverage`.
+The current local verification run contains 82 passing tests. Coverage is
+90.97% statements/lines, 81.70% branches, and 94.91% functions.
 
 `vitest.config.ts` enforces 85% statements/lines/functions and 80% branches.
 GitHub Actions runs the same `npm run coverage` command before build and

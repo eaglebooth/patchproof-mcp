@@ -6,6 +6,7 @@
     "config": {
       "ecosystem": "npm",
       "auditMode": "mock",
+      "auditSource": "mock",
       "lockfileStatus": "ok",
       "sbomSchemaVersion": "1.5",
       "sbomSerialNumber": "urn:uuid:5495ce3a-61df-41af-8975-ff0e42b4cb4e",
@@ -92,45 +93,77 @@
       "low": 0
     }
   },
-  "reachability": [],
+  "reachability": [
+    {
+      "findingId": "lodash@4.17.20:GHSA-xxxx-yyyy-zzzz",
+      "package": "lodash",
+      "classification": "confirmed",
+      "evidence": [
+        {
+          "file": "src/index.ts",
+          "line": 1,
+          "snippet": "import lodash from 'lodash';"
+        }
+      ]
+    },
+    {
+      "findingId": "minimatch@3.0.4:GHSA-aaaa-bbbb-cccc",
+      "package": "minimatch",
+      "classification": "confirmed",
+      "evidence": [
+        {
+          "file": "src/index.ts",
+          "line": 2,
+          "snippet": "import minimatch from 'minimatch';"
+        }
+      ]
+    }
+  ],
   "remediation": [
+    {
+      "package": "minimatch",
+      "currentVersion": "3.0.4",
+      "recommendedVersion": "3.1.2",
+      "breakingChangeRisk": "medium",
+      "affectedFiles": [
+        "package-lock.json",
+        "package.json",
+        "src/index.ts"
+      ],
+      "verificationCommands": [
+        "npm run typecheck",
+        "npm test",
+        "npm run build"
+      ],
+      "rationale": "Upgrade to a version that fixes GHSA-aaaa-bbbb-cccc. Reachability is confirmed with 1 source reference(s)."
+    },
     {
       "package": "lodash",
       "currentVersion": "4.17.20",
       "recommendedVersion": "4.17.21",
       "breakingChangeRisk": "low",
       "affectedFiles": [
+        "package-lock.json",
         "package.json",
-        "package-lock.json"
+        "src/index.ts"
       ],
       "verificationCommands": [
         "npm run typecheck",
         "npm test",
         "npm run build"
       ],
-      "rationale": "Upgrade to a version that fixes GHSA-xxxx-yyyy-zzzz."
-    },
-    {
-      "package": "minimatch",
-      "currentVersion": "3.0.4",
-      "recommendedVersion": "3.1.2",
-      "breakingChangeRisk": "low",
-      "affectedFiles": [
-        "package.json",
-        "package-lock.json"
-      ],
-      "verificationCommands": [
-        "npm run typecheck",
-        "npm test",
-        "npm run build"
-      ],
-      "rationale": "Upgrade to a version that fixes GHSA-aaaa-bbbb-cccc."
+      "rationale": "Upgrade to a version that fixes GHSA-xxxx-yyyy-zzzz. Reachability is confirmed with 1 source reference(s)."
     }
   ],
   "verification": [],
+  "verificationPlan": [
+    "npm run typecheck",
+    "npm test",
+    "npm run build"
+  ],
   "limitations": [
-    "Vulnerability matching uses a deterministic local fixture table and does not query the live OSV service.",
-    "Reachability analysis and verification command execution are not implemented in this four-tool MVP."
+    "Deterministic mock OSV mode was selected; use osvMode=live to query api.osv.dev.",
+    "Verification commands were planned but not executed; set verify=true for the allowlisted local checks."
   ],
   "redactions": []
 }

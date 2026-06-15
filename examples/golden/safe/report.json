@@ -6,6 +6,7 @@
     "config": {
       "ecosystem": "npm",
       "auditMode": "mock",
+      "auditSource": "mock",
       "lockfileStatus": "ok",
       "sbomSchemaVersion": "1.5",
       "sbomSerialNumber": "urn:uuid:e88bd40b-f9d5-47c2-88ca-c6be4d850103",
@@ -28,9 +29,10 @@
   "reachability": [],
   "remediation": [],
   "verification": [],
+  "verificationPlan": [],
   "limitations": [
-    "Vulnerability matching uses a deterministic local fixture table and does not query the live OSV service.",
-    "Reachability analysis and verification command execution are not implemented in this four-tool MVP."
+    "Deterministic mock OSV mode was selected; use osvMode=live to query api.osv.dev.",
+    "Verification commands were planned but not executed; set verify=true for the allowlisted local checks."
   ],
   "redactions": []
 }

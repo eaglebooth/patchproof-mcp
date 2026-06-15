@@ -21,8 +21,8 @@ describe('loadConfig', () => {
     expect(c.transport).toBe('http');
   });
 
-  it('rejects the unimplemented live OSV mode', () => {
-    expect(() => loadConfig({ PATCHPROOF_OSV_MODE: 'live' }, [])).toThrow();
+  it('accepts the implemented live OSV mode', () => {
+    expect(loadConfig({ PATCHPROOF_OSV_MODE: 'live' }, []).osvMode).toBe('live');
   });
 
   it('rejects an invalid transport', () => {

@@ -109,6 +109,7 @@ export interface EvidenceReport {
   readonly reachability: ReadonlyArray<ReachabilityResult>;
   readonly remediation: ReadonlyArray<Remediation>;
   readonly verification: ReadonlyArray<VerificationResult>;
+  readonly verificationPlan: ReadonlyArray<string>;
   readonly limitations: ReadonlyArray<string>;
   readonly redactions: ReadonlyArray<{ readonly kind: string; readonly count: number }>;
 }

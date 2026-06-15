@@ -8,6 +8,9 @@ import type { ToolContext, ToolDefinition } from './types.js';
 export const generateEvidenceReportInputSchema = z.object({
   repoRoot: z.string().min(1).optional(),
   format: z.enum(['json', 'html', 'both']).default('both'),
+  osvMode: z.enum(['mock', 'live']).default('mock'),
+  fallbackToMock: z.boolean().default(true),
+  verify: z.boolean().default(false),
 });
 
 export type GenerateEvidenceReportInput = z.infer<typeof generateEvidenceReportInputSchema>;
@@ -22,14 +25,17 @@ export interface GenerateEvidenceReportOutput {
 export const generateEvidenceReportTool: ToolDefinition = {
   name: 'generate_evidence_report',
   description:
-    'Combine the CycloneDX component inventory and deterministic vulnerability audit into JSON ' +
-    'findings, upgrade recommendations, and a self-contained HTML report.',
+    'Build end-to-end dependency evidence: SBOM, OSV findings, source reachability, ranked ' +
+    'remediation, optional allowlisted verification, and a self-contained HTML report.',
   inputSchema: generateEvidenceReportInputSchema,
   run: async (ctx: ToolContext, input: unknown): Promise<GenerateEvidenceReportOutput> => {
     const parsed = input as GenerateEvidenceReportInput;
     return generateReport(ctx, {
       repoRoot: parsed.repoRoot,
       format: parsed.format,
+      osvMode: parsed.osvMode,
+      fallbackToMock: parsed.fallbackToMock,
+      verify: parsed.verify,
     });
   },
 };

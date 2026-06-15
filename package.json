@@ -1,7 +1,7 @@
 {
   "name": "patchproof-mcp",
   "version": "0.1.0",
-  "description": "Four-tool MCP server for deterministic npm scanning, CycloneDX SBOM generation, dependency auditing, and evidence reporting.",
+  "description": "Four-tool MCP server for npm SBOMs, live OSV auditing, source reachability, remediation, and verifiable evidence.",
   "private": true,
   "type": "module",
   "main": "dist/server/index.js",

@@ -20,7 +20,9 @@
   <div class="metric"><strong>2</strong>SBOM components</div>
   <div class="metric"><strong>2</strong>vulnerabilities</div>
   <div class="metric"><strong>61</strong>highest risk</div>
+  <div class="metric"><strong>0</strong>confirmed reachable</div>
   <div class="metric"><strong>2</strong>remediations</div>
+  <div class="metric"><strong>0/0</strong>checks passed</div>
 </section>
 <pre>{
   &quot;schemaVersion&quot;: &quot;1.0.0&quot;,
@@ -30,6 +32,7 @@
     &quot;config&quot;: {
       &quot;ecosystem&quot;: &quot;npm&quot;,
       &quot;auditMode&quot;: &quot;mock&quot;,
+      &quot;auditSource&quot;: &quot;mock&quot;,
       &quot;lockfileStatus&quot;: &quot;ok&quot;,
       &quot;sbomSchemaVersion&quot;: &quot;1.5&quot;,
       &quot;sbomSerialNumber&quot;: &quot;urn:uuid:27604c9d-cbef-47f2-86d2-a8496ab6315f&quot;,
@@ -116,45 +119,63 @@
       &quot;low&quot;: 0
     }
   },
-  &quot;reachability&quot;: [],
+  &quot;reachability&quot;: [
+    {
+      &quot;findingId&quot;: &quot;lodash@4.17.20:GHSA-xxxx-yyyy-zzzz&quot;,
+      &quot;package&quot;: &quot;lodash&quot;,
+      &quot;classification&quot;: &quot;unknown&quot;,
+      &quot;evidence&quot;: []
+    },
+    {
+      &quot;findingId&quot;: &quot;minimatch@3.0.4:GHSA-aaaa-bbbb-cccc&quot;,
+      &quot;package&quot;: &quot;minimatch&quot;,
+      &quot;classification&quot;: &quot;unknown&quot;,
+      &quot;evidence&quot;: []
+    }
+  ],
   &quot;remediation&quot;: [
+    {
+      &quot;package&quot;: &quot;minimatch&quot;,
+      &quot;currentVersion&quot;: &quot;3.0.4&quot;,
+      &quot;recommendedVersion&quot;: &quot;3.1.2&quot;,
+      &quot;breakingChangeRisk&quot;: &quot;medium&quot;,
+      &quot;affectedFiles&quot;: [
+        &quot;package-lock.json&quot;,
+        &quot;package.json&quot;
+      ],
+      &quot;verificationCommands&quot;: [
+        &quot;npm run typecheck&quot;,
+        &quot;npm test&quot;,
+        &quot;npm run build&quot;
+      ],
+      &quot;rationale&quot;: &quot;Upgrade to a version that fixes GHSA-aaaa-bbbb-cccc. Reachability is unknown with 0 source reference(s).&quot;
+    },
     {
       &quot;package&quot;: &quot;lodash&quot;,
       &quot;currentVersion&quot;: &quot;4.17.20&quot;,
       &quot;recommendedVersion&quot;: &quot;4.17.21&quot;,
       &quot;breakingChangeRisk&quot;: &quot;low&quot;,
       &quot;affectedFiles&quot;: [
-        &quot;package.json&quot;,
-        &quot;package-lock.json&quot;
+        &quot;package-lock.json&quot;,
+        &quot;package.json&quot;
       ],
       &quot;verificationCommands&quot;: [
         &quot;npm run typecheck&quot;,
         &quot;npm test&quot;,
         &quot;npm run build&quot;
       ],
-      &quot;rationale&quot;: &quot;Upgrade to a version that fixes GHSA-xxxx-yyyy-zzzz.&quot;
-    },
-    {
-      &quot;package&quot;: &quot;minimatch&quot;,
-      &quot;currentVersion&quot;: &quot;3.0.4&quot;,
-      &quot;recommendedVersion&quot;: &quot;3.1.2&quot;,
-      &quot;breakingChangeRisk&quot;: &quot;low&quot;,
-      &quot;affectedFiles&quot;: [
-        &quot;package.json&quot;,
-        &quot;package-lock.json&quot;
-      ],
-      &quot;verificationCommands&quot;: [
-        &quot;npm run typecheck&quot;,
-        &quot;npm test&quot;,
-        &quot;npm run build&quot;
-      ],
-      &quot;rationale&quot;: &quot;Upgrade to a version that fixes GHSA-aaaa-bbbb-cccc.&quot;
+      &quot;rationale&quot;: &quot;Upgrade to a version that fixes GHSA-xxxx-yyyy-zzzz. Reachability is unknown with 0 source reference(s).&quot;
     }
   ],
   &quot;verification&quot;: [],
+  &quot;verificationPlan&quot;: [
+    &quot;npm run typecheck&quot;,
+    &quot;npm test&quot;,
+    &quot;npm run build&quot;
+  ],
   &quot;limitations&quot;: [
-    &quot;Vulnerability matching uses a deterministic local fixture table and does not query the live OSV service.&quot;,
-    &quot;Reachability analysis and verification command execution are not implemented in this four-tool MVP.&quot;
+    &quot;Deterministic mock OSV mode was selected; use osvMode=live to query api.osv.dev.&quot;,
+    &quot;Verification commands were planned but not executed; set verify=true for the allowlisted local checks.&quot;
   ],
   &quot;redactions&quot;: []
 }</pre>

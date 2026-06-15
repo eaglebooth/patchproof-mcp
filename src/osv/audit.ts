@@ -1,7 +1,4 @@
-/**
- * Deterministic dependency audit backed by an in-memory table
- * keyed by name@version. It performs no network requests.
- */
+/** Dependency audit with deterministic mock and bounded live OSV modes. */
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 
@@ -10,18 +7,24 @@ import { parseNpmLockfileDetailed, type ParsedLockfileEntry } from '../parsers/l
 import type { LockfileStatus } from '../sbom/cyclonedx.js';
 import type { Dependency, OsvVulnerabilitySummary, Severity } from '../types/index.js';
 import type { ToolContext } from '../tools/types.js';
+import { queryLiveOsv, type LiveOsvOptions, type OsvDependencyMatch } from './live.js';
 
 export interface AuditDependenciesInput extends RunRepositoryScanInput {
-  readonly osvMode?: 'mock' | undefined;
+  readonly osvMode?: 'mock' | 'live' | undefined;
+  readonly fallbackToMock?: boolean | undefined;
   readonly ecosystem?: 'npm' | undefined;
+  readonly liveOptions?: LiveOsvOptions | undefined;
 }
 
 export interface AuditDependenciesOutput {
   readonly repoRoot: string;
-  readonly osvMode: 'mock';
+  readonly osvMode: 'mock' | 'live';
+  readonly source: 'mock' | 'live' | 'mock-fallback';
   readonly lockfileStatus: LockfileStatus;
   readonly dependencies: ReadonlyArray<Dependency>;
   readonly vulnerabilities: ReadonlyArray<OsvVulnerabilitySummary>;
+  readonly matches: ReadonlyArray<OsvDependencyMatch>;
+  readonly warnings: ReadonlyArray<string>;
 }
 
 const LOCKFILE_BASENAME = 'package-lock.json';
@@ -113,30 +116,79 @@ export async function auditDependencies(
     purl: `pkg:npm/${e.name}@${e.version}`,
   }));
 
-  const vulnerabilities: OsvVulnerabilitySummary[] = [];
-  for (const dep of entries) {
+  const requestedMode = input.osvMode ?? 'mock';
+  if (requestedMode === 'live') {
+    try {
+      const matches = await queryLiveOsv(dependencies, {
+        ...input.liveOptions,
+        signal: ctx.signal,
+      });
+      return {
+        repoRoot: root,
+        osvMode: 'live',
+        source: 'live',
+        lockfileStatus,
+        dependencies,
+        vulnerabilities: matches.map((match) => match.vulnerability),
+        matches,
+        warnings: [],
+      };
+    } catch (error: unknown) {
+      if (input.fallbackToMock === false) throw error;
+      const matches = buildMockMatches(dependencies);
+      return {
+        repoRoot: root,
+        osvMode: 'live',
+        source: 'mock-fallback',
+        lockfileStatus,
+        dependencies,
+        vulnerabilities: matches.map((match) => match.vulnerability),
+        matches,
+        warnings: [
+          `Live OSV was unavailable; deterministic mock fallback was used: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        ],
+      };
+    }
+  }
+
+  const matches = buildMockMatches(dependencies);
+  return {
+    repoRoot: root,
+    osvMode: 'mock',
+    source: 'mock',
+    lockfileStatus,
+    dependencies,
+    vulnerabilities: matches.map((match) => match.vulnerability),
+    matches,
+    warnings: [],
+  };
+}
+
+function buildMockMatches(
+  dependencies: ReadonlyArray<Dependency>,
+): ReadonlyArray<OsvDependencyMatch> {
+  const matches: OsvDependencyMatch[] = [];
+  for (const dep of dependencies) {
     const key = `${dep.name}@${dep.version}`;
     const mock = MOCK_VULNS.get(key);
     if (!mock) continue;
     for (const v of mock) {
-      vulnerabilities.push({
-        id: v.id,
-        aliases: v.aliases ?? [],
-        summary: v.summary,
-        severity: v.severity,
-        ...(typeof v.cvssScore === 'number' ? { cvssScore: v.cvssScore } : {}),
-        fixedVersions: v.fixedVersions,
+      matches.push({
+        dependency: dep,
+        vulnerability: {
+          id: v.id,
+          aliases: v.aliases ?? [],
+          summary: v.summary,
+          severity: v.severity,
+          ...(typeof v.cvssScore === 'number' ? { cvssScore: v.cvssScore } : {}),
+          fixedVersions: v.fixedVersions,
+        },
       });
     }
   }
-
-  return {
-    repoRoot: root,
-    osvMode: 'mock',
-    lockfileStatus,
-    dependencies,
-    vulnerabilities,
-  };
+  return matches;
 }
 
 function isMissingFile(error: unknown): boolean {

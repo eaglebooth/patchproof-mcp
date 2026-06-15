@@ -15,7 +15,7 @@ const Port = z
   .default('8765');
 
 const TransportSchema = z.enum(['stdio', 'http']);
-const OsvModeSchema = z.literal('mock');
+const OsvModeSchema = z.enum(['mock', 'live']);
 
 const ConfigSchema = z
   .object({
@@ -160,7 +160,7 @@ export function loadConfig(
       if (typeof v === 'string' && /^\d+$/u.test(v)) raw['httpPort'] = v;
     } else if (a === '--mode' && i + 1 < argv.length) {
       const v = argv[i + 1];
-      if (v === 'mock') raw['osvMode'] = v;
+      if (v === 'mock' || v === 'live') raw['osvMode'] = v;
     } else if (a === '--host' && i + 1 < argv.length) {
       const v = argv[i + 1];
       if (typeof v === 'string' && v.length > 0) raw['httpHost'] = v;

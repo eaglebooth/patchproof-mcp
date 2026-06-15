@@ -39,6 +39,8 @@ interface ReportResult {
     findings: ReadonlyArray<{ id: string; risk?: { score: number; band: string } }>;
     riskSummary: { highestScore: number; averageScore: number };
     remediation: ReadonlyArray<{ package: string; recommendedVersion: string }>;
+    reachability: ReadonlyArray<{ package: string; classification: string }>;
+    verificationPlan: ReadonlyArray<string>;
     limitations: ReadonlyArray<string>;
   };
   html?: string;
@@ -157,6 +159,14 @@ describe('core MCP tools', () => {
     expect(result.report.remediation).toContainEqual(
       expect.objectContaining({ package: 'lodash', recommendedVersion: '4.17.21' }),
     );
+    expect(result.report.reachability).toContainEqual(
+      expect.objectContaining({ package: 'lodash', classification: 'confirmed' }),
+    );
+    expect(result.report.verificationPlan).toEqual([
+      'npm run typecheck',
+      'npm test',
+      'npm run build',
+    ]);
     expect(result.report.limitations.length).toBeGreaterThan(0);
     expect(result.html).toContain('<!doctype html>');
     expect(result.html).toContain('PatchProof Evidence Report');

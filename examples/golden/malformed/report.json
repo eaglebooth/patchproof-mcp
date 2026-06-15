@@ -6,6 +6,7 @@
     "config": {
       "ecosystem": "npm",
       "auditMode": "mock",
+      "auditSource": "mock",
       "lockfileStatus": "malformed",
       "sbomSchemaVersion": "1.5",
       "sbomSerialNumber": "urn:uuid:31533537-49a2-41bf-87dc-114f7a6c9348",
@@ -35,9 +36,10 @@
   "reachability": [],
   "remediation": [],
   "verification": [],
+  "verificationPlan": [],
   "limitations": [
-    "Vulnerability matching uses a deterministic local fixture table and does not query the live OSV service.",
-    "Reachability analysis and verification command execution are not implemented in this four-tool MVP.",
+    "Deterministic mock OSV mode was selected; use osvMode=live to query api.osv.dev.",
+    "Verification commands were planned but not executed; set verify=true for the allowlisted local checks.",
     "package-lock.json status is malformed; dependency-derived output is incomplete."
   ],
   "redactions": []

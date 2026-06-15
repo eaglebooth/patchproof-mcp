@@ -20,7 +20,9 @@
   <div class="metric"><strong>1</strong>SBOM components</div>
   <div class="metric"><strong>0</strong>vulnerabilities</div>
   <div class="metric"><strong>0</strong>highest risk</div>
+  <div class="metric"><strong>0</strong>confirmed reachable</div>
   <div class="metric"><strong>0</strong>remediations</div>
+  <div class="metric"><strong>0/0</strong>checks passed</div>
 </section>
 <pre>{
   &quot;schemaVersion&quot;: &quot;1.0.0&quot;,
@@ -30,6 +32,7 @@
     &quot;config&quot;: {
       &quot;ecosystem&quot;: &quot;npm&quot;,
       &quot;auditMode&quot;: &quot;mock&quot;,
+      &quot;auditSource&quot;: &quot;mock&quot;,
       &quot;lockfileStatus&quot;: &quot;ok&quot;,
       &quot;sbomSchemaVersion&quot;: &quot;1.5&quot;,
       &quot;sbomSerialNumber&quot;: &quot;urn:uuid:e88bd40b-f9d5-47c2-88ca-c6be4d850103&quot;,
@@ -52,9 +55,10 @@
   &quot;reachability&quot;: [],
   &quot;remediation&quot;: [],
   &quot;verification&quot;: [],
+  &quot;verificationPlan&quot;: [],
   &quot;limitations&quot;: [
-    &quot;Vulnerability matching uses a deterministic local fixture table and does not query the live OSV service.&quot;,
-    &quot;Reachability analysis and verification command execution are not implemented in this four-tool MVP.&quot;
+    &quot;Deterministic mock OSV mode was selected; use osvMode=live to query api.osv.dev.&quot;,
+    &quot;Verification commands were planned but not executed; set verify=true for the allowlisted local checks.&quot;
   ],
   &quot;redactions&quot;: []
 }</pre>
